@@ -1,0 +1,46 @@
+name: Repo Guardrails
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  repo-guardrails:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify required files exist
+        run: |
+          set -euo pipefail
+
+          required_files=(
+            "AGENTS.md"
+            ".env.example"
+            "pnpm-workspace.yaml"
+            "docs/MVP开发计划.md"
+            "docs/project/current-status.md"
+            "docs/contracts/domain-model.md"
+            "docs/contracts/api-contracts.md"
+            "docs/contracts/rule-template-schema-v1.md"
+            "docs/product/user-flow-and-page-states.md"
+            "docs/architecture/technical-solution-and-constraints.md"
+            "docs/acceptance/acceptance-criteria-and-test-checklist.md"
+          )
+
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "Missing required file: $file"
+              exit 1
+            fi
+          done
+
+      - name: Verify sample strategies exist
+        run: |
+          set -euo pipefail
+          test -f "docs/samples/ma-cross-btcusdt-4h.json"
+          test -f "docs/samples/rsi-threshold-ethusdt-1d.json"

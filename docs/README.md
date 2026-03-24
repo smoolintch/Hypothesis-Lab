@@ -23,16 +23,17 @@ samples/                  样例策略、样例数据、回归样例
 2. `architecture/system-architecture-and-module-boundaries.md`
 3. `contracts/domain-model.md`
 4. `contracts/api-contracts.md`
-5. `project/current-status.md`
-6. `project/task-breakdown-and-development-order.md`
-7. `acceptance/acceptance-criteria-and-test-checklist.md`
-8. `collaboration/ai-collaboration-rules.md`
+5. `contracts/rule-template-schema-v1.md`
+6. `product/user-flow-and-page-states.md`
+7. `project/current-status.md`
+8. `project/task-breakdown-and-development-order.md`
+9. `acceptance/acceptance-criteria-and-test-checklist.md`
+10. `collaboration/ai-collaboration-rules.md`
 
 ### P1：现在先写骨架，开发中持续补全
-1. `product/user-flow-and-page-states.md`
-2. `project/session-handoff.md`
-3. `adr/ADR-0001-template.md`
-4. `ops/deployment-and-environment.md`
+1. `project/session-handoff.md`
+2. `adr/ADR-0001-template.md`
+3. `ops/deployment-and-environment.md`
 
 ### P2：随着实现逐步充实
 1. `samples/` 下的固定样例策略

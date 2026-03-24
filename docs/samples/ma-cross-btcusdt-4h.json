@@ -1,0 +1,43 @@
+{
+  "name": "BTC 4H EMA Cross",
+  "symbol": "BTCUSDT",
+  "timeframe": "4H",
+  "backtest_range": {
+    "start_at": "2023-01-01T00:00:00Z",
+    "end_at": "2024-01-01T00:00:00Z"
+  },
+  "initial_capital": 10000,
+  "fee_rate": 0.001,
+  "rule_set": {
+    "entry": {
+      "template_key": "ma_cross",
+      "params": {
+        "ma_type": "ema",
+        "fast_period": 20,
+        "slow_period": 50,
+        "cross_direction": "golden"
+      }
+    },
+    "exit": {
+      "template_key": "ma_cross",
+      "params": {
+        "ma_type": "ema",
+        "fast_period": 20,
+        "slow_period": 50,
+        "cross_direction": "dead"
+      }
+    },
+    "stop_loss": {
+      "template_key": "fixed_stop_loss",
+      "params": {
+        "stop_loss_rate": 0.08
+      }
+    },
+    "take_profit": {
+      "template_key": "fixed_take_profit",
+      "params": {
+        "take_profit_rate": 0.15
+      }
+    }
+  }
+}

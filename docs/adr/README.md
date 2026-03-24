@@ -15,4 +15,5 @@ ADR 是 `Architecture Decision Record`，用于记录重要技术决策，避免
 - `ADR-0002-xxx.md`
 
 ## 当前状态
-当前先保留模板，待第一条正式技术决策产生时开始记录。
+当前已有首条正式决策：
+1. `ADR-0001-mvp-engineering-conventions.md`

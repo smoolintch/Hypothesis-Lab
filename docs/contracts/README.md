@@ -9,3 +9,9 @@
 3. `BacktestResult` 返回结构
 4. `Conclusion` 与 `HandbookEntry` 关联方式
 5. 错误码与异常返回格式
+6. `RuleTemplate` 参数 schema 与标准化输出结构
+
+## 当前核心文档
+1. `domain-model.md`
+2. `api-contracts.md`
+3. `rule-template-schema-v1.md`

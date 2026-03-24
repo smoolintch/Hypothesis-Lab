@@ -35,8 +35,9 @@
 
 ### 阶段 0
 1. 文档齐备
-2. 契约已冻结
-3. 工程初始化可启动
+2. `domain-model`、`api-contracts`、`rule-template-schema-v1`、`user-flow-and-page-states` 已冻结到可执行级别
+3. Git 仓库与远程仓库已就绪
+4. 工程初始化可启动
 
 ### 阶段 1
 1. 策略表单可保存
