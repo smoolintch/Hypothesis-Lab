@@ -1,0 +1,11 @@
+{
+  "name": "hypothesis-lab",
+  "private": true,
+  "description": "pnpm workspace root for the Hypothesis Lab monorepo.",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "dev": "corepack pnpm --filter @hypothesis-lab/web dev",
+    "lint": "corepack pnpm --filter @hypothesis-lab/web lint",
+    "build": "corepack pnpm --filter @hypothesis-lab/web build"
+  }
+}

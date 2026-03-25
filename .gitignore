@@ -7,6 +7,7 @@ Thumbs.db
 # Node / Frontend
 node_modules/
 .next/
+*.tsbuildinfo
 dist/
 build/
 coverage/

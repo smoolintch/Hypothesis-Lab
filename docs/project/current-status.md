@@ -13,7 +13,8 @@
 7. 根目录已补充 `pnpm-workspace.yaml` 与 `.env.example`。
 8. 已建立最小 CI 骨架 `repo-guardrails.yml`。
 9. 已补充第一批固定样例策略。
-10. `apps/web` 与 `services/api` 尚未初始化具体技术栈。
+10. `apps/web` 已完成最小前端技术栈初始化。
+11. `services/api` 已完成最小后端技术栈初始化：`FastAPI + uv + Alembic` 工程骨架已落地。
 
 ## 3. 当前已冻结或基本确定的事项
 1. 架构方向：模块化单体
@@ -29,24 +30,24 @@
 11. MVP 核心范围：策略假设卡、回测、结果、结论、交易手册
 
 ## 4. 当前最优先任务
-1. 初始化 `apps/web`
-2. 初始化 `services/api`
-3. 准备固定行情数据
-4. 建立最小测试基线
+1. 准备固定行情数据
+2. 建立最小测试基线
+3. 为 `apps/web` 接入后续页面与 API 调用层
+4. 在 `services/api` 中开始首批业务能力实现
 
 当前已经可以进入“阶段 0B：工程底座”执行，不建议再回到契约骨架阶段反复摇摆。
 
 ## 5. 当前推荐的下一步
-1. 用 `pnpm` 初始化根工作区与 `apps/web`
-2. 用 `uv` 初始化 `services/api`
-3. 在 `services/api` 中接入 `Alembic`
-4. 补齐固定行情数据
-5. 建立最小测试基线
+1. 补齐固定行情数据
+2. 建立最小测试基线
+3. 在 `services/api` 中实现首批业务迁移与持久化模型
+4. 在 `apps/web` 中按冻结契约接入页面与数据请求层
+5. 补充 API 侧测试与开发脚本
 
 ## 6. 当前未决问题
 1. 本地数据库采用容器方式还是本地安装方式，尚未最终记录
 2. 固定行情样本的来源与导入脚本尚未落地
-3. `apps/web` 与 `services/api` 的实际初始化命令尚未执行
+3. 本地 PostgreSQL 是否已启动，取决于各开发环境；当前已完成 Alembic 命令接线，但未把数据库启动方式统一落文档
 
 ## 7. 最近已完成事项
 1. 项目顶层目录与模块子目录已建立
@@ -59,6 +60,14 @@
 8. 已补充 `.env.example` 与 `pnpm-workspace.yaml`
 9. 已建立最小 CI 骨架 `repo-guardrails.yml`
 10. 已补充第一批固定样例策略
+11. 已补充根级 `package.json`，形成最小 `pnpm` workspace root
+12. 已初始化 `apps/web` 最小 Next.js App Router + TypeScript 骨架
+13. 已安装前端基础依赖：`react-hook-form`、`zod`、`@hookform/resolvers`、`@tanstack/react-query`
+14. `apps/web` 已通过 `lint`、`typecheck`、`build` 验证
+15. 已初始化 `services/api` 最小 `FastAPI + uv + Alembic` 工程骨架
+16. `services/api` 已建立 `app/api`、`app/application`、`app/domain`、`app/infrastructure`、`app/schemas` 分层目录
+17. `services/api` 已接入基础配置加载与 Alembic 骨架
+18. `services/api` 已验证应用可启动且当前不包含任何自定义业务接口
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`
