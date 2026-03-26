@@ -3,8 +3,8 @@
   "symbol": "ETHUSDT",
   "timeframe": "1D",
   "backtest_range": {
-    "start_at": "2022-01-01T00:00:00Z",
-    "end_at": "2024-01-01T00:00:00Z"
+    "start_at": "2024-01-01T00:00:00Z",
+    "end_at": "2024-01-06T00:00:00Z"
   },
   "initial_capital": 10000,
   "fee_rate": 0.001,

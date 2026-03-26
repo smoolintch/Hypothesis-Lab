@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
   pull_request:
 
 jobs:
@@ -14,33 +15,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Verify required files exist
-        run: |
-          set -euo pipefail
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
-          required_files=(
-            "AGENTS.md"
-            ".env.example"
-            "pnpm-workspace.yaml"
-            "docs/MVP开发计划.md"
-            "docs/project/current-status.md"
-            "docs/contracts/domain-model.md"
-            "docs/contracts/api-contracts.md"
-            "docs/contracts/rule-template-schema-v1.md"
-            "docs/product/user-flow-and-page-states.md"
-            "docs/architecture/technical-solution-and-constraints.md"
-            "docs/acceptance/acceptance-criteria-and-test-checklist.md"
-          )
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
-          for file in "${required_files[@]}"; do
-            if [ ! -f "$file" ]; then
-              echo "Missing required file: $file"
-              exit 1
-            fi
-          done
+      - name: Install API dev dependencies
+        working-directory: services/api
+        run: uv sync --locked --dev
 
-      - name: Verify sample strategies exist
-        run: |
-          set -euo pipefail
-          test -f "docs/samples/ma-cross-btcusdt-4h.json"
-          test -f "docs/samples/rsi-threshold-ethusdt-1d.json"
+      - name: Run repo guardrails baseline
+        run: npm run test:repo-guardrails
+
+  api-smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install API dev dependencies
+        working-directory: services/api
+        run: uv sync --locked --dev
+
+      - name: Run API smoke baseline
+        run: npm run test:api-smoke
