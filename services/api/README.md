@@ -2,7 +2,7 @@
 
 主后端目录，负责应用编排、接口输出、数据持久化和与回测引擎协作。
 
-当前已初始化最小工程底座，技术栈固定为 `FastAPI + uv + Alembic`，但尚未实现任何业务接口。
+当前已初始化最小工程底座，技术栈固定为 `FastAPI + uv + Alembic`，并已落地 `StrategyCard` 的最小保存/读取/更新闭环。
 
 ## 当前目录结构
 
@@ -13,11 +13,12 @@ app/
   domain/                 领域对象与业务规则
   infrastructure/
     config/               配置加载
-    database/             SQLAlchemy 基础定义
+    database/             SQLAlchemy 基础定义、模型与仓储
   schemas/                请求响应模型与内部 DTO
 alembic/                  Alembic 迁移骨架
 alembic.ini               Alembic 入口配置
 pyproject.toml            uv 工程定义
+tests/                    最小 API 集成测试
 uv.lock                   uv 依赖锁文件
 ```
 
@@ -36,12 +37,17 @@ uv.lock                   uv 依赖锁文件
 2. 最小 FastAPI 应用入口 `app.main:app`
 3. 基础配置加载，优先读取根目录 `.env`，缺失时回退到 `.env.example`
 4. `Alembic` 初始化与数据库 URL 接线
+5. `StrategyCard` 最小持久化模型与首个业务迁移
+6. `POST /api/strategy-cards`
+7. `GET /api/strategy-cards/{id}`
+8. `PUT /api/strategy-cards/{id}`
 
 ## 当前刻意未做的内容
 
-1. 不实现任何业务接口
-2. 不新增 `/health`、`/ping`、`/ready` 等自定义路由
-3. 不引入认证、多用户、任务队列、缓存、中间件体系
+1. 不实现 `BacktestRun`、`StrategySnapshot`、`BacktestResult`
+2. 不实现结论、手册、首页概览接口
+3. 不新增 `/health`、`/ping`、`/ready` 等自定义路由
+4. 不引入认证、多用户、任务队列、缓存、中间件体系
 
 ## 本地运行
 
@@ -65,4 +71,12 @@ uv run python -m app
 uv run alembic current
 uv run alembic revision -m "init"
 uv run alembic upgrade head
+```
+
+## 当前最小验证
+
+在 `services/api` 目录下执行：
+
+```bash
+uv run pytest tests/integration/test_strategy_cards_api.py
 ```

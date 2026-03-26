@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from uuid import UUID
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -21,6 +22,8 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     app_env: str = Field(default="development", alias="APP_ENV")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
+    app_user_mode: str = Field(default="single_user", alias="APP_USER_MODE")
+    default_user_id: UUID = Field(alias="DEFAULT_USER_ID")
     api_host: str = Field(default="0.0.0.0", alias="API_HOST")
     api_port: int = Field(default=8000, alias="API_PORT")
     database_url: str = Field(alias="DATABASE_URL")
