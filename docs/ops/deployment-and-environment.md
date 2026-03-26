@@ -112,16 +112,21 @@ data/market/<source>/<symbol>/<timeframe>/<version>/
 说明：
 1. 根目录已补充最小 `package.json` 作为 `pnpm` workspace root。
 2. `apps/web` 已按 `Next.js + React + TypeScript` 初始化为 App Router + `src/` 目录模式。
-3. 根目录脚本内部通过 `corepack pnpm` 转发到工作区包，避免在 `lab` 环境下找不到 `pnpm` 可执行文件。
-4. `services/api` 已按 `FastAPI + uv + Alembic` 初始化最小工程骨架。
-5. 当前后端最小启动命令：
+3. `apps/web` 通过 Next.js rewrite 将同源 `/api/*` 请求代理到 `NEXT_PUBLIC_API_BASE_URL`，浏览器联调时不依赖后端额外开放 CORS。
+4. 如本地 API 不在 `8000` 端口，可在启动前端前临时覆盖 `NEXT_PUBLIC_API_BASE_URL`，例如：`NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8001/api npm run dev`。
+5. 根目录脚本内部通过 `corepack pnpm` 转发到工作区包，避免在 `lab` 环境下找不到 `pnpm` 可执行文件。
+6. `apps/web` 当前已落地并验证通过的首批页面路由：
+   - `/strategy-cards/new`
+   - `/strategy-cards/{id}/edit`
+7. `services/api` 已按 `FastAPI + uv + Alembic` 初始化最小工程骨架。
+8. 当前后端最小启动命令：
    - 在 `services/api` 目录执行 `uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`
    - 或在 `services/api` 目录执行 `uv run python -m app`
-6. 当前后端已落地首批业务接口：
+9. 当前后端已落地首批业务接口：
    - `POST /api/strategy-cards`
    - `GET /api/strategy-cards/{id}`
    - `PUT /api/strategy-cards/{id}`
-7. 当前后端仍未新增任何自定义健康检查接口。
+10. 当前后端仍未新增任何自定义健康检查接口。
 
 ## 9. 测试环境说明
 1. 单元测试和集成测试优先在本地执行。

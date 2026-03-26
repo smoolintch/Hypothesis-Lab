@@ -32,3 +32,4 @@ venv/
 # Local data / temp
 tmp/
 temp/
+test-results/

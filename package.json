@@ -9,6 +9,12 @@
     "build": "corepack pnpm --filter @hypothesis-lab/web build",
     "test": "npm run test:repo-guardrails && npm run test:api-smoke",
     "test:repo-guardrails": "cd services/api && uv run pytest ../../tests/integration/test_repo_guardrails.py -q",
-    "test:api-smoke": "cd services/api && uv run pytest ../../tests/integration/api -q"
+    "test:api-smoke": "cd services/api && uv run pytest ../../tests/integration/api -q",
+    "test:e2e": "playwright test",
+    "test:e2e:strategy-card": "playwright test tests/e2e/core-flow/strategy-card.spec.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "playwright": "^1.58.2"
   }
 }

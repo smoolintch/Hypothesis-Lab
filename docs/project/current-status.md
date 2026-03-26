@@ -19,6 +19,7 @@
 13. 仓库级最小测试基线与最小 CI 护栏已落地：可执行仓库护栏检查与 API 基础 smoke test。
 14. 阶段 0 所需的文档冻结与工程底座目标已完成，当前优先级已切换到阶段 1 的起步任务。
 15. `services/api` 已落地 `StrategyCard` 最小后端闭环：持久化模型、迁移、`POST/GET/PUT` 接口与基础校验已可用。
+16. `apps/web` 已落地 `StrategyCard` 最小前端闭环：`/strategy-cards/new`、`/strategy-cards/{id}/edit`、规则模板驱动表单、真实 API 新建/读取/更新、保存后跳转与编辑回填已可用。
 
 ## 3. 当前已冻结或基本确定的事项
 1. 架构方向：模块化单体
@@ -34,19 +35,17 @@
 11. MVP 核心范围：策略假设卡、回测、结果、结论、交易手册
 
 ## 4. 当前最优先任务
-1. 实现规则模板 schema 对应的前端表单渲染
-2. 在 `apps/web` 中接入策略卡表单
-3. 接入策略卡保存与编辑接口
-4. 打通保存后再次加载与回填
+1. 衔接“保存后发起回测”的下一段前端主链路
+2. 在不引入列表接口的前提下继续推进阶段 1 后续页面
+3. 持续维护 `StrategyCard` 自动化基线稳定性并纳入验收执行
 
 阶段 0 已正式收尾，当前最优先工作应围绕“阶段 1：策略输入链路”的首批闭环任务推进。
 
 ## 5. 当前推荐的下一步
-1. 在 `apps/web` 中按冻结契约接入规则模板渲染与策略卡表单
-2. 基于已落地的 `POST /api/strategy-cards`、`GET /api/strategy-cards/{id}`、`PUT /api/strategy-cards/{id}` 打通保存与编辑回填
-3. 在现有基线之上补充策略输入链路的 API 与页面测试
+1. 在当前 `StrategyCard` 闭环之上接入 `POST /api/strategy-cards/{id}/backtests` 与结果页占位状态
+2. 保持不依赖 `GET /api/strategy-cards` 列表接口的推进方式，暂不扩展首页完整列表
+3. 将 `test:e2e:strategy-card` 纳入验收环境固定检查项
 4. 保持固定行情样本与回测链路准备状态，暂不扩展阶段 1 之外的基础设施
-5. 如前端导航确有需要，再补最小策略卡列表接口
 
 ## 6. 当前未决问题
 1. 本地数据库采用容器方式还是本地安装方式，尚未最终记录
@@ -85,6 +84,11 @@
 29. 已为 `StrategyCard` 接入基础字段校验、模板键位置校验和模板参数校验
 30. 已通过 SQLite 临时库验证 `StrategyCard` 的创建、读取、更新与回填链路
 31. 已通过 SQLite 临时库验证 `Alembic upgrade head` 可执行到首个 `StrategyCard` 迁移版本
+32. 已在 `apps/web` 中接入 `StrategyCard` 请求层、React Query 查询/更新封装与规则模板表单 schema
+33. 已实现 `/strategy-cards/new` 与 `/strategy-cards/{id}/edit` 两个页面路由及真实 API 对接
+34. 已在 `apps/web` 中实现规则模板驱动的动态表单区块，并在模板切换时清理旧参数
+35. 已通过浏览器验证“新建 -> 保存 -> 跳转编辑 -> 再次加载 -> 回填 -> 更新保存”最小前端闭环
+36. 已在本机补齐 Playwright Chromium 依赖并跑通 `test:e2e:strategy-card`（3/3 通过）
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`
