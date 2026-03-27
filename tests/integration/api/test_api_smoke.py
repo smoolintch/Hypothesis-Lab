@@ -35,3 +35,7 @@ def test_default_fastapi_docs_endpoints_are_available() -> None:
     assert "/api/strategy-cards/{strategy_card_id}" in openapi_document["paths"]
     assert "get" in openapi_document["paths"]["/api/strategy-cards/{strategy_card_id}"]
     assert "put" in openapi_document["paths"]["/api/strategy-cards/{strategy_card_id}"]
+    assert "/api/strategy-cards/{strategy_card_id}/backtests" in openapi_document["paths"]
+    assert "post" in openapi_document["paths"]["/api/strategy-cards/{strategy_card_id}/backtests"]
+    assert "/api/backtests/{run_id}" in openapi_document["paths"]
+    assert "get" in openapi_document["paths"]["/api/backtests/{run_id}"]

@@ -40,3 +40,4 @@ class StrategyCardModel(Base):
         nullable=False,
         default=utc_now,
     )
+    latest_backtest_run_id: Mapped[UUID | None] = mapped_column(nullable=True)

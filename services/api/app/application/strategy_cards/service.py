@@ -99,7 +99,7 @@ class StrategyCardService:
             timeframe=record.timeframe,
             status=record.status,
             updated_at=coerce_utc(record.updated_at),
-            latest_backtest_run_id=None,
+            latest_backtest_run_id=record.latest_backtest_run_id,
             backtest_range=BacktestRangePayload.model_validate(record.backtest_range),
             initial_capital=float(record.initial_capital),
             fee_rate=float(record.fee_rate),

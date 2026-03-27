@@ -1,0 +1,30 @@
+from __future__ import annotations
+
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.orm import Session
+
+from app.application.backtests.service import BacktestRunService
+from app.infrastructure.database import get_session
+from app.schemas.backtests import BacktestRunResponse
+from app.schemas.common import SuccessResponse
+
+router = APIRouter(prefix="/backtests", tags=["backtests"])
+
+
+def get_backtest_run_service(session: Session = Depends(get_session)) -> BacktestRunService:
+    return BacktestRunService(session)
+
+
+@router.get(
+    "/{run_id}",
+    response_model=SuccessResponse[BacktestRunResponse],
+    status_code=status.HTTP_200_OK,
+)
+def get_backtest_run(
+    run_id: UUID,
+    service: BacktestRunService = Depends(get_backtest_run_service),
+) -> SuccessResponse[BacktestRunResponse]:
+    detail = service.get_run(run_id)
+    return SuccessResponse[BacktestRunResponse](data=detail)

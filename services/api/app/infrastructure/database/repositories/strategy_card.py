@@ -83,3 +83,14 @@ class StrategyCardRepository:
         self.session.commit()
         self.session.refresh(record)
         return record
+
+    def update_latest_backtest_run_id(
+        self,
+        *,
+        record: StrategyCardModel,
+        latest_backtest_run_id: UUID | None,
+    ) -> StrategyCardModel:
+        record.latest_backtest_run_id = latest_backtest_run_id
+        self.session.add(record)
+        self.session.flush()
+        return record

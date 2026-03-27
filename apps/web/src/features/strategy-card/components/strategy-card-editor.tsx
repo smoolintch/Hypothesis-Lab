@@ -11,6 +11,8 @@ import {
   useForm,
 } from "react-hook-form";
 
+import { useStartBacktestMutation } from "@/features/backtest/api";
+
 import {
   ApiClientError,
   useCreateStrategyCardMutation,
@@ -235,6 +237,7 @@ export function StrategyCardEditor({
   const copy = getPageCopy(mode);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<ApiClientError | null>(null);
+  const [backtestError, setBacktestError] = useState<ApiClientError | null>(null);
 
   const defaultValues = useMemo(() => createDefaultStrategyCardFormValues(), []);
   const form = useForm<StrategyCardFormInput, unknown, StrategyCardFormValues>({
@@ -249,6 +252,9 @@ export function StrategyCardEditor({
   );
   const createMutation = useCreateStrategyCardMutation();
   const updateMutation = useUpdateStrategyCardMutation(strategyCardId);
+  const startBacktestMutation = useStartBacktestMutation(
+    mode === "edit" ? strategyCardId : undefined,
+  );
   const activeMutation = mode === "edit" ? updateMutation : createMutation;
   const detail = strategyCardQuery.data as StrategyCardDetail | undefined;
 
@@ -265,6 +271,7 @@ export function StrategyCardEditor({
     form.clearErrors();
     setSaveMessage(null);
     setSubmitError(null);
+    setBacktestError(null);
 
     try {
       const payload = toStrategyCardPayload(values);
@@ -291,6 +298,59 @@ export function StrategyCardEditor({
 
       applyApiErrorToForm(apiError, form.setError);
       setSubmitError(apiError);
+    }
+  }
+
+  async function handleStartBacktest() {
+    if (mode !== "edit" || !strategyCardId) {
+      return;
+    }
+
+    setBacktestError(null);
+    setSaveMessage(null);
+
+    const valid = await form.trigger();
+    if (!valid) {
+      return;
+    }
+
+    if (form.formState.isDirty) {
+      try {
+        setSubmitError(null);
+        const values = strategyCardFormSchema.parse(form.getValues());
+        const saved = await updateMutation.mutateAsync(
+          toStrategyCardPayload(values),
+        );
+        form.reset(toStrategyCardFormValues(saved));
+        setSaveMessage("策略已保存");
+      } catch (error) {
+        const apiError =
+          error instanceof ApiClientError
+            ? error
+            : new ApiClientError({
+                status: 500,
+                fallbackMessage: "保存失败，请稍后重试。",
+              });
+
+        applyApiErrorToForm(apiError, form.setError);
+        setSubmitError(apiError);
+        return;
+      }
+    }
+
+    try {
+      const run = await startBacktestMutation.mutateAsync();
+      router.push(`/backtests/${run.run_id}`);
+    } catch (error) {
+      const apiError =
+        error instanceof ApiClientError
+          ? error
+          : new ApiClientError({
+              status: 500,
+              fallbackMessage: "发起回测失败，请稍后重试。",
+            });
+
+      setBacktestError(apiError);
     }
   }
 
@@ -421,6 +481,16 @@ export function StrategyCardEditor({
             </div>
           ) : null}
 
+          {backtestError ? (
+            <div
+              className={`${styles.message} ${styles.messageError}`}
+              data-testid="strategy-card-backtest-error"
+            >
+              <p className={styles.messageTitle}>发起回测失败</p>
+              <p>{backtestError.message}</p>
+            </div>
+          ) : null}
+
           {saveMessage ? (
             <div
               className={`${styles.message} ${styles.messageSuccess}`}
@@ -452,10 +522,29 @@ export function StrategyCardEditor({
                     返回首页
                   </Link>
                 )}
+                {mode === "edit" && strategyCardId ? (
+                  <button
+                    className={styles.buttonSecondary}
+                    data-testid="strategy-card-start-backtest-button"
+                    disabled={
+                      activeMutation.isPending ||
+                      form.formState.isSubmitting ||
+                      startBacktestMutation.isPending
+                    }
+                    type="button"
+                    onClick={() => void handleStartBacktest()}
+                  >
+                    {startBacktestMutation.isPending ? "发起中..." : "发起回测"}
+                  </button>
+                ) : null}
                 <button
                   className={styles.buttonPrimary}
                   data-testid="strategy-card-submit-button"
-                  disabled={activeMutation.isPending || form.formState.isSubmitting}
+                  disabled={
+                    activeMutation.isPending ||
+                    form.formState.isSubmitting ||
+                    startBacktestMutation.isPending
+                  }
                   type="submit"
                 >
                   {activeMutation.isPending || form.formState.isSubmitting

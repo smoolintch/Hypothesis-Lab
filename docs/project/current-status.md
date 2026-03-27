@@ -20,6 +20,8 @@
 14. 阶段 0 所需的文档冻结与工程底座目标已完成，当前优先级已切换到阶段 1 的起步任务。
 15. `services/api` 已落地 `StrategyCard` 最小后端闭环：持久化模型、迁移、`POST/GET/PUT` 接口与基础校验已可用。
 16. `apps/web` 已落地 `StrategyCard` 最小前端闭环：`/strategy-cards/new`、`/strategy-cards/{id}/edit`、规则模板驱动表单、真实 API 新建/读取/更新、保存后跳转与编辑回填已可用。
+17. `services/api` 已落地「发起回测」占位后端链路：`StrategySnapshot`（含 `normalized_config`、按策略卡递增 `version`）、`BacktestRun`（`run_id`、关联快照、初始 `status=queued`）、`POST /api/strategy-cards/{id}/backtests`（`202`）与 `GET /api/backtests/{run_id}`；不执行真实回测、不落地 `BacktestResult`。
+18. `apps/web` 已接入「发起回测 → 结果页占位」主链路：编辑页 `发起回测`（未保存时先校验并保存）、`POST /api/strategy-cards/{id}/backtests` 成功后跳转 `/backtests/{run_id}`，结果页用 `GET /api/backtests/{run_id}` 展示真实 `run_id` 与 `status`（占位文案，不伪造结果指标）。
 
 ## 3. 当前已冻结或基本确定的事项
 1. 架构方向：模块化单体
@@ -35,16 +37,16 @@
 11. MVP 核心范围：策略假设卡、回测、结果、结论、交易手册
 
 ## 4. 当前最优先任务
-1. 衔接“保存后发起回测”的下一段前端主链路
-2. 在不引入列表接口的前提下继续推进阶段 1 后续页面
-3. 持续维护 `StrategyCard` 自动化基线稳定性并纳入验收执行
+1. 在不引入列表接口的前提下继续推进阶段 1 后续页面
+2. 衔接下一段主链路：真实回测执行与结果页消费
+3. 持续维护 `StrategyCard` 与回测占位链路的自动化基线稳定性并纳入验收执行
 
 阶段 0 已正式收尾，当前最优先工作应围绕“阶段 1：策略输入链路”的首批闭环任务推进。
 
 ## 5. 当前推荐的下一步
-1. 在当前 `StrategyCard` 闭环之上接入 `POST /api/strategy-cards/{id}/backtests` 与结果页占位状态
-2. 保持不依赖 `GET /api/strategy-cards` 列表接口的推进方式，暂不扩展首页完整列表
-3. 将 `test:e2e:strategy-card` 纳入验收环境固定检查项
+1. 保持不依赖 `GET /api/strategy-cards` 列表接口的推进方式，暂不扩展首页完整列表
+2. 将 `test:e2e:strategy-card` 与 `tests/e2e/core-flow/backtest-placeholder.spec.ts` 纳入验收环境固定检查项
+3. 衔接下一阶段：真实回测执行与 `GET /api/backtests/{run_id}/result` 消费（契约已预留，非本轮范围）
 4. 保持固定行情样本与回测链路准备状态，暂不扩展阶段 1 之外的基础设施
 
 ## 6. 当前未决问题
@@ -90,6 +92,12 @@
 35. 已通过浏览器验证“新建 -> 保存 -> 跳转编辑 -> 再次加载 -> 回填 -> 更新保存”最小前端闭环
 36. 已在本机补齐 Playwright Chromium 依赖并跑通 `test:e2e:strategy-card`（3/3 通过）
 37. 已将 `api-smoke` 基线断言更新为匹配当前公开的 `StrategyCard` OpenAPI 路由，恢复最小 CI 基线通过状态
+38. 已在 `services/api` 落地 `StrategySnapshot`、`BacktestRun` 持久化模型与第二版 Alembic 迁移（`strategy_snapshots`、`backtest_runs`、策略卡 `latest_backtest_run_id`）
+39. 已实现从 `StrategyCard` 生成不可变快照与 `normalized_config`、同一策略卡多次发起回测时 `version` 递增
+40. 已通过 SQLite 临时库验证 `POST /api/strategy-cards/{id}/backtests` 与 `GET /api/backtests/{run_id}`；集成测试 `tests/integration/test_backtests_placeholder.py` 覆盖快照与 run 关联、latest 更新与 404
+41. 已为 `StrategySnapshot(strategy_card_id, version)` 唯一约束冲突补齐保守处理：发起回测时若遇到版本冲突，会回滚当前事务并重试生成下一版 `version`，不再直接暴露为 `500`
+42. 已在 `apps/web` 落地编辑页「发起回测」、占位结果页 `/backtests/{run_id}` 及真实 API 对接（`POST` 创建 run、`GET` 展示状态；`queued`/`running` 轻量轮询）
+43. 已新增并跑通 `tests/e2e/core-flow/backtest-placeholder.spec.ts`，独立验证“发起回测 -> 跳转结果页占位”主链路与不存在 `run_id` 的错误态
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`

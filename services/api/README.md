@@ -2,7 +2,7 @@
 
 主后端目录，负责应用编排、接口输出、数据持久化和与回测引擎协作。
 
-当前已初始化最小工程底座，技术栈固定为 `FastAPI + uv + Alembic`，并已落地 `StrategyCard` 的最小保存/读取/更新闭环。
+当前已初始化最小工程底座，技术栈固定为 `FastAPI + uv + Alembic`，并已落地 `StrategyCard` 的保存/读取/更新，以及「发起回测」占位链路（快照 + `BacktestRun`，状态 `queued`，不执行真实回测）。
 
 ## 当前目录结构
 
@@ -41,13 +41,16 @@ uv.lock                   uv 依赖锁文件
 6. `POST /api/strategy-cards`
 7. `GET /api/strategy-cards/{id}`
 8. `PUT /api/strategy-cards/{id}`
+9. `POST /api/strategy-cards/{id}/backtests`（`202 Accepted`，返回 `BacktestRunResponse`）
+10. `GET /api/backtests/{run_id}`
 
 ## 当前刻意未做的内容
 
-1. 不实现 `BacktestRun`、`StrategySnapshot`、`BacktestResult`
-2. 不实现结论、手册、首页概览接口
-3. 不新增 `/health`、`/ping`、`/ready` 等自定义路由
-4. 不引入认证、多用户、任务队列、缓存、中间件体系
+1. 不实现真实回测执行，不生成 `BacktestResult`
+2. 不实现 `GET /api/backtests/{run_id}/result`
+3. 不实现结论、手册、首页概览接口
+4. 不新增 `/health`、`/ping`、`/ready` 等自定义路由
+5. 不引入认证、多用户、任务队列、缓存、中间件体系
 
 ## 本地运行
 
@@ -78,5 +81,5 @@ uv run alembic upgrade head
 在 `services/api` 目录下执行：
 
 ```bash
-uv run pytest tests/integration/test_strategy_cards_api.py
+uv run pytest tests/integration/test_strategy_cards_api.py tests/integration/test_backtests_placeholder.py
 ```

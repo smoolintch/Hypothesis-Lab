@@ -33,3 +33,4 @@ venv/
 tmp/
 temp/
 test-results/
+services/api/strategy_cards_smoke_review.db

@@ -27,3 +27,13 @@ class StrategyCardNotFoundError(AppError):
             message="Strategy card was not found.",
             details={"strategy_card_id": strategy_card_id},
         )
+
+
+class BacktestRunNotFoundError(AppError):
+    def __init__(self, run_id: str) -> None:
+        super().__init__(
+            status_code=404,
+            code="BACKTEST_RUN_NOT_FOUND",
+            message="Backtest run was not found.",
+            details={"run_id": run_id},
+        )

@@ -118,6 +118,7 @@ data/market/<source>/<symbol>/<timeframe>/<version>/
 6. `apps/web` 当前已落地并验证通过的首批页面路由：
    - `/strategy-cards/new`
    - `/strategy-cards/{id}/edit`
+   - `/backtests/{run_id}`（占位：展示真实 `run_id` 与 `status`，不渲染回测结果指标）
 7. `services/api` 已按 `FastAPI + uv + Alembic` 初始化最小工程骨架。
 8. 当前后端最小启动命令：
    - 在 `services/api` 目录执行 `uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`
@@ -126,6 +127,8 @@ data/market/<source>/<symbol>/<timeframe>/<version>/
    - `POST /api/strategy-cards`
    - `GET /api/strategy-cards/{id}`
    - `PUT /api/strategy-cards/{id}`
+   - `POST /api/strategy-cards/{id}/backtests`（`202 Accepted`，占位：创建快照与 `BacktestRun`，状态 `queued`，不执行真实回测）
+   - `GET /api/backtests/{run_id}`（查询占位 run 状态；不含结果接口）
 10. 当前后端仍未新增任何自定义健康检查接口。
 
 ## 9. 测试环境说明
@@ -136,8 +139,8 @@ data/market/<source>/<symbol>/<timeframe>/<version>/
 5. 当前最小测试基线包含：
    - `npm run test:repo-guardrails`：验证仓库关键文件、样例策略和固定数据集 manifest 是否齐备
    - `npm run test:api-smoke`：验证 `services/api` 最小 FastAPI 应用可创建，且默认 `docs/openapi/redoc` 端点可访问
-6. `services/api` 的测试依赖通过 `uv` 管理；如需单独执行 `StrategyCard` 最小链路测试，可在 `services/api` 目录执行 `uv run pytest tests/integration/test_strategy_cards_api.py`
-7. 如需在无 PostgreSQL 的情况下验证迁移脚本，可在 `services/api` 目录执行 `DATABASE_URL=sqlite+pysqlite:///./strategy_cards_smoke.db uv run alembic upgrade head`
+6. `services/api` 的测试依赖通过 `uv` 管理；如需单独执行 `StrategyCard` 与回测占位链路测试，可在 `services/api` 目录执行 `uv run pytest tests/integration/test_strategy_cards_api.py tests/integration/test_backtests_placeholder.py`
+7. 如需在无 PostgreSQL 的情况下验证迁移脚本，可在 `services/api` 目录执行 `DATABASE_URL=sqlite+pysqlite:///./strategy_cards_smoke.db uv run alembic upgrade head`（应包含 `StrategyCard` 与 `strategy_snapshots` / `backtest_runs` 等迁移）
 8. 当前 `.github/workflows/repo-guardrails.yml` 已覆盖仓库护栏检查和 API smoke baseline
 
 ## 10. 仍待补齐的内容
