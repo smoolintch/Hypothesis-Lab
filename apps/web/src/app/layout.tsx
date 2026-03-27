@@ -6,7 +6,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Hypothesis Lab",
-  description: "Web app scaffold for Hypothesis Lab.",
+  description:
+    "策略假设与回测实验工作台：从策略卡到回测、结果与结论的最小闭环（MVP）。",
 };
 
 export default function RootLayout({

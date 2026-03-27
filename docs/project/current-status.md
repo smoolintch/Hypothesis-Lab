@@ -22,6 +22,7 @@
 16. `apps/web` 已落地 `StrategyCard` 最小前端闭环：`/strategy-cards/new`、`/strategy-cards/{id}/edit`、规则模板驱动表单、真实 API 新建/读取/更新、保存后跳转与编辑回填已可用。
 17. `services/api` 已落地「发起回测」占位后端链路：`StrategySnapshot`（含 `normalized_config`、按策略卡递增 `version`）、`BacktestRun`（`run_id`、关联快照、初始 `status=queued`）、`POST /api/strategy-cards/{id}/backtests`（`202`）与 `GET /api/backtests/{run_id}`；不执行真实回测、不落地 `BacktestResult`。
 18. `apps/web` 已接入「发起回测 → 结果页占位」主链路：编辑页 `发起回测`（未保存时先校验并保存）、`POST /api/strategy-cards/{id}/backtests` 成功后跳转 `/backtests/{run_id}`，结果页用 `GET /api/backtests/{run_id}` 展示真实 `run_id` 与 `status`（占位文案，不伪造结果指标）。
+19. `apps/web` 首页 `/` 已落地阶段 1 最小版本：产品定位文案、MVP 闭环说明、「新建策略假设」主入口跳转 `/strategy-cards/new`，不依赖列表或 dashboard 接口。
 
 ## 3. 当前已冻结或基本确定的事项
 1. 架构方向：模块化单体
@@ -98,6 +99,8 @@
 41. 已为 `StrategySnapshot(strategy_card_id, version)` 唯一约束冲突补齐保守处理：发起回测时若遇到版本冲突，会回滚当前事务并重试生成下一版 `version`，不再直接暴露为 `500`
 42. 已在 `apps/web` 落地编辑页「发起回测」、占位结果页 `/backtests/{run_id}` 及真实 API 对接（`POST` 创建 run、`GET` 展示状态；`queued`/`running` 轻量轮询）
 43. 已新增并跑通 `tests/e2e/core-flow/backtest-placeholder.spec.ts`，独立验证“发起回测 -> 跳转结果页占位”主链路与不存在 `run_id` 的错误态
+44. 已将 `apps/web` 首页 `/` 从工程占位替换为阶段 1 最小首页（定位 + MVP 闭环说明 +「新建策略假设」入口），无列表/无 dashboard 依赖
+45. 已新增并跑通 `tests/e2e/core-flow/home-entry.spec.ts`，独立验证首页 `/` 已成立且“新建策略假设”入口可跳转 `/strategy-cards/new`
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`

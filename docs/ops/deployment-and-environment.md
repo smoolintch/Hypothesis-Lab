@@ -116,6 +116,7 @@ data/market/<source>/<symbol>/<timeframe>/<version>/
 4. 如本地 API 不在 `8000` 端口，可在启动前端前临时覆盖 `NEXT_PUBLIC_API_BASE_URL`，例如：`NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8001/api npm run dev`。
 5. 根目录脚本内部通过 `corepack pnpm` 转发到工作区包，避免在 `lab` 环境下找不到 `pnpm` 可执行文件。
 6. `apps/web` 当前已落地并验证通过的首批页面路由：
+   - `/`（阶段 1 最小首页：定位文案 +「新建策略假设」入口，无列表依赖）
    - `/strategy-cards/new`
    - `/strategy-cards/{id}/edit`
    - `/backtests/{run_id}`（占位：展示真实 `run_id` 与 `status`，不渲染回测结果指标）
