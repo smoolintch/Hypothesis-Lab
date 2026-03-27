@@ -89,6 +89,7 @@
 34. 已在 `apps/web` 中实现规则模板驱动的动态表单区块，并在模板切换时清理旧参数
 35. 已通过浏览器验证“新建 -> 保存 -> 跳转编辑 -> 再次加载 -> 回填 -> 更新保存”最小前端闭环
 36. 已在本机补齐 Playwright Chromium 依赖并跑通 `test:e2e:strategy-card`（3/3 通过）
+37. 已将 `api-smoke` 基线断言更新为匹配当前公开的 `StrategyCard` OpenAPI 路由，恢复最小 CI 基线通过状态
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`

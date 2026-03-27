@@ -27,5 +27,11 @@ def test_default_fastapi_docs_endpoints_are_available() -> None:
     assert docs_response.status_code == 200
     assert openapi_response.status_code == 200
     assert redoc_response.status_code == 200
-    assert openapi_response.json()["info"]["title"] == "Hypothesis Lab API"
-    assert openapi_response.json()["paths"] == {}
+    openapi_document = openapi_response.json()
+
+    assert openapi_document["info"]["title"] == "Hypothesis Lab API"
+    assert "/api/strategy-cards" in openapi_document["paths"]
+    assert "post" in openapi_document["paths"]["/api/strategy-cards"]
+    assert "/api/strategy-cards/{strategy_card_id}" in openapi_document["paths"]
+    assert "get" in openapi_document["paths"]["/api/strategy-cards/{strategy_card_id}"]
+    assert "put" in openapi_document["paths"]["/api/strategy-cards/{strategy_card_id}"]
