@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.application.backtests.service import BacktestRunService
 from app.infrastructure.database import get_session
-from app.schemas.backtests import BacktestRunResponse
+from app.schemas.backtests import BacktestResultResponse, BacktestRunResponse
 from app.schemas.common import SuccessResponse
 
 router = APIRouter(prefix="/backtests", tags=["backtests"])
@@ -28,3 +28,16 @@ def get_backtest_run(
 ) -> SuccessResponse[BacktestRunResponse]:
     detail = service.get_run(run_id)
     return SuccessResponse[BacktestRunResponse](data=detail)
+
+
+@router.get(
+    "/{run_id}/result",
+    response_model=SuccessResponse[BacktestResultResponse],
+    status_code=status.HTTP_200_OK,
+)
+def get_backtest_result(
+    run_id: UUID,
+    service: BacktestRunService = Depends(get_backtest_run_service),
+) -> SuccessResponse[BacktestResultResponse]:
+    detail = service.get_result(run_id)
+    return SuccessResponse[BacktestResultResponse](data=detail)

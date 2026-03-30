@@ -19,3 +19,52 @@ class BacktestRunResponse(BaseModel):
     finished_at: datetime | None
     result_url: str | None
     created_at: datetime
+
+
+class SummaryMetricsResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    total_return_rate: float
+    max_drawdown_rate: float
+    win_rate: float
+    profit_factor: float
+    trade_count: int
+    avg_holding_bars: float
+    final_equity: float
+
+
+class CurvePointResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ts: str
+    value: float
+
+
+class TradeRecordResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    trade_id: str
+    entry_at: str
+    exit_at: str
+    entry_price: float
+    exit_price: float
+    quantity: float
+    pnl_amount: float
+    pnl_rate: float
+    exit_reason: str
+
+
+class BacktestResultResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    result_id: UUID
+    run_id: UUID
+    strategy_card_id: UUID
+    strategy_snapshot_id: UUID
+    dataset_version: str
+    summary_metrics: SummaryMetricsResponse
+    equity_curve: list[CurvePointResponse]
+    drawdown_curve: list[CurvePointResponse]
+    trades: list[TradeRecordResponse]
+    result_summary: dict
+    created_at: datetime

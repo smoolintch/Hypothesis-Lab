@@ -143,6 +143,7 @@ data/market/<source>/<symbol>/<timeframe>/<version>/
 6. `services/api` 的测试依赖通过 `uv` 管理；如需单独执行 `StrategyCard` 与回测占位链路测试，可在 `services/api` 目录执行 `uv run pytest tests/integration/test_strategy_cards_api.py tests/integration/test_backtests_placeholder.py`
 7. 如需在无 PostgreSQL 的情况下验证迁移脚本，可在 `services/api` 目录执行 `DATABASE_URL=sqlite+pysqlite:///./strategy_cards_smoke.db uv run alembic upgrade head`（应包含 `StrategyCard` 与 `strategy_snapshots` / `backtest_runs` 等迁移）
 8. 当前 `.github/workflows/repo-guardrails.yml` 已覆盖仓库护栏检查和 API smoke baseline
+9. 如需单独验证回测引擎的标准化行情读取接口，可在 `packages/backtest-engine` 目录执行 `uv run --with pytest pytest`
 
 ## 10. 仍待补齐的内容
 1. 数据库容器或本地安装方案

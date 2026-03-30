@@ -1,7 +1,7 @@
 # 项目当前状态
 
 ## 1. 当前阶段
-`阶段 1：策略输入链路（阶段 0 已正式完成）`
+`阶段 3：结果与沉淀链路（阶段 2 已正式验收通过，可进入阶段 3）`
 
 ## 2. 当前总体情况
 1. 产品定义与 MVP 功能清单已完成。
@@ -23,6 +23,8 @@
 17. `services/api` 已落地「发起回测」占位后端链路：`StrategySnapshot`（含 `normalized_config`、按策略卡递增 `version`）、`BacktestRun`（`run_id`、关联快照、初始 `status=queued`）、`POST /api/strategy-cards/{id}/backtests`（`202`）与 `GET /api/backtests/{run_id}`；不执行真实回测、不落地 `BacktestResult`。
 18. `apps/web` 已接入「发起回测 → 结果页占位」主链路：编辑页 `发起回测`（未保存时先校验并保存）、`POST /api/strategy-cards/{id}/backtests` 成功后跳转 `/backtests/{run_id}`，结果页用 `GET /api/backtests/{run_id}` 展示真实 `run_id` 与 `status`（占位文案，不伪造结果指标）。
 19. `apps/web` 首页 `/` 已落地阶段 1 最小版本：产品定位文案、MVP 闭环说明、「新建策略假设」主入口跳转 `/strategy-cards/new`，不依赖列表或 dashboard 接口。
+20. `packages/backtest-engine` 已落地最小标准化行情数据读取接口：支持基于 `symbol`、`timeframe`、`version` 与可选 `backtest_range` 读取固定样本数据，并输出标准化 candle 结构。
+21. `packages/backtest-engine` 已落地阶段 2 的最小回测执行内核：支持消费 `NormalizedStrategyConfig` 与标准化 candle 序列，覆盖单标的、单策略、单周期、`long_only`、`all_in`，并支持 `ma_cross`、`rsi_threshold`、`fixed_stop_loss`、`fixed_take_profit` 的最小可运行子集，输出交易记录、资金曲线基础点位、期末权益与累计手续费。
 
 ## 3. 当前已冻结或基本确定的事项
 1. 架构方向：模块化单体
@@ -38,17 +40,18 @@
 11. MVP 核心范围：策略假设卡、回测、结果、结论、交易手册
 
 ## 4. 当前最优先任务
-1. 在不引入列表接口的前提下继续推进阶段 1 后续页面
-2. 衔接下一段主链路：真实回测执行与结果页消费
-3. 持续维护 `StrategyCard` 与回测占位链路的自动化基线稳定性并纳入验收执行
+1. 进入阶段 3：实现结果页可读展示（核心指标卡片、资金曲线、交易明细）
+2. 实现 `GET /api/backtests/{run_id}/result` 的前端消费（结果页展示真实指标）
+3. 实现结论填写与保存（`POST /api/strategy-cards/{id}/conclusions`）
 
-阶段 0 已正式收尾，当前最优先工作应围绕“阶段 1：策略输入链路”的首批闭环任务推进。
+阶段 2 主链路（真实回测执行 + `BacktestResult` 持久化 + 结果读取）已正式验收通过（2026-03-30），可进入阶段 3。
+**⚠️ 注意：阶段 2 代码尚未 checkpoint commit**：`packages/backtest-engine/` 全部文件未跟踪，`services/api/pyproject.toml` 与 `uv.lock` 有未提交修改，进入阶段 3 前应先做 checkpoint commit。
 
 ## 5. 当前推荐的下一步
-1. 保持不依赖 `GET /api/strategy-cards` 列表接口的推进方式，暂不扩展首页完整列表
-2. 将 `test:e2e:strategy-card` 与 `tests/e2e/core-flow/backtest-placeholder.spec.ts` 纳入验收环境固定检查项
-3. 衔接下一阶段：真实回测执行与 `GET /api/backtests/{run_id}/result` 消费（契约已预留，非本轮范围）
-4. 保持固定行情样本与回测链路准备状态，暂不扩展阶段 1 之外的基础设施
+1. 前端（`apps/web`）的结果页 `/backtests/{run_id}` 接入 `GET /api/backtests/{run_id}/result`，展示真实指标
+2. 实现阶段 3 核心结果页：核心指标卡片、资金曲线（ECharts）、交易明细列表
+3. 实现结论填写与保存（`POST /api/strategy-cards/{id}/conclusions`）
+4. 将回测引擎执行集成测试纳入固定回归基线
 
 ## 6. 当前未决问题
 1. 本地数据库采用容器方式还是本地安装方式，尚未最终记录
@@ -101,6 +104,15 @@
 43. 已新增并跑通 `tests/e2e/core-flow/backtest-placeholder.spec.ts`，独立验证“发起回测 -> 跳转结果页占位”主链路与不存在 `run_id` 的错误态
 44. 已将 `apps/web` 首页 `/` 从工程占位替换为阶段 1 最小首页（定位 + MVP 闭环说明 +「新建策略假设」入口），无列表/无 dashboard 依赖
 45. 已新增并跑通 `tests/e2e/core-flow/home-entry.spec.ts`，独立验证首页 `/` 已成立且“新建策略假设”入口可跳转 `/strategy-cards/new`
+46. 已在 `packages/backtest-engine` 初始化最小 Python 包结构与 `pyproject.toml`
+47. 已在 `packages/backtest-engine/src/backtest_engine/data` 落地标准化行情读取层：数据结构、错误类型、dataset resolver、manifest 读取、CSV 解析、UTC/升序校验与可选 `backtest_range` 过滤
+48. 已在 `packages/backtest-engine/tests/test_market_data_loader.py` 覆盖正常读取、不存在数据集、非法格式和范围过滤四类最小测试，并通过 `uv run --with pytest pytest` 验证 4/4 通过
+49. 已在 `packages/backtest-engine/src/backtest_engine/core` 与 `metrics` 落地最小回测执行内核：标准化配置解析、`ma_cross` / `rsi_threshold` 信号解释、`fixed_stop_loss` / `fixed_take_profit` 风控、单仓位 `all_in` / `long_only` 执行循环，以及交易记录、资金曲线、期末权益输出
+50. 已在 `packages/backtest-engine/tests/test_backtest_runner.py` 覆盖标准化固定样本可运行、重复运行结果一致、`ma_cross`、`rsi_threshold`、止损触发等最小回归样例，并通过 `uv run pytest` 验证 `packages/backtest-engine` 当前 9/9 测试通过
+51. 已在 `services/api` 接入 `packages/backtest-engine` 真实回测执行：`BacktestRunService.start_backtest_for_strategy_card` 现在同步执行真实回测（`run_backtest`）并将结果持久化为 `BacktestResult`；`BacktestRun.status` 更新为 `succeeded`（成功）或 `failed`（失败并记录 `error_code`/`error_message`）
+52. 已落地 `BacktestResult` 最小持久化：新增 `backtest_results` 表（Alembic 迁移 `20260330_01`）与 `BacktestResultModel`/`BacktestResultRepository`，字段覆盖 `summary_metrics`、`equity_curve`、`drawdown_curve`、`trades`、`result_summary`（阶段 2 为空 `{}`）、`dataset_version`
+53. 已落地 `GET /api/backtests/{run_id}/result` 接口，返回 `BacktestResultResponse`；`BacktestRunResponse.result_url` 在 `succeeded` 时自动填充为 `/api/backtests/{run_id}/result`
+54. 已新增 `services/api/tests/integration/test_backtest_real_execution.py`（6 个集成测试，覆盖 succeeded 状态、真实指标结构、结果一致性、409/422/404 错误态）；更新 `test_backtests_placeholder.py`（修正 backtest_range 日期匹配 fixture 覆盖范围）；全部 20 个 API 集成测试通过
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`

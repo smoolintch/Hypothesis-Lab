@@ -37,3 +37,24 @@ class BacktestRunNotFoundError(AppError):
             message="Backtest run was not found.",
             details={"run_id": run_id},
         )
+
+
+class BacktestResultNotReadyError(AppError):
+    def __init__(self, run_id: str) -> None:
+        super().__init__(
+            status_code=409,
+            code="BACKTEST_RESULT_NOT_READY",
+            message="Backtest result is not ready yet.",
+            details={"run_id": run_id},
+        )
+
+
+class BacktestResultUnavailableError(AppError):
+    def __init__(self, run_id: str) -> None:
+        super().__init__(
+            status_code=422,
+            code="BACKTEST_RESULT_UNAVAILABLE",
+            message="Backtest run failed; no result is available.",
+            details={"run_id": run_id},
+        )
+

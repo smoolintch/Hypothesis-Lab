@@ -30,3 +30,7 @@
 1. 提交信息规范
 2. 文档更新的最小要求
 3. 是否需要补充文件级 Cursor Rules
+
+## 6. 相关协作文档
+1. `AGENTS.md`：项目级执行总入口
+2. `docs/collaboration/agent-commander-playbook.md`：军师型 Agent 的职责、派工顺序、checkpoint 判断与输出格式规范

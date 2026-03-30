@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: hypothesis-lab-backtest-engine
+Version: 0.1.0
+Summary: Hypothesis Lab backtest engine
+Requires-Python: >=3.13

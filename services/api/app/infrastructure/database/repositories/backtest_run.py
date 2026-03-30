@@ -37,6 +37,28 @@ class BacktestRunRepository:
         self.session.flush()
         return record
 
+    def update_status(
+        self,
+        record: BacktestRunModel,
+        *,
+        status: str,
+        started_at: datetime | None = None,
+        finished_at: datetime | None = None,
+        error_code: str | None = None,
+        error_message: str | None = None,
+    ) -> BacktestRunModel:
+        record.status = status
+        if started_at is not None:
+            record.started_at = started_at
+        if finished_at is not None:
+            record.finished_at = finished_at
+        if error_code is not None:
+            record.error_code = error_code
+        if error_message is not None:
+            record.error_message = error_message
+        self.session.flush()
+        return record
+
     def get_by_id_for_user(
         self,
         *,

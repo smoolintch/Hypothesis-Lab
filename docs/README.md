@@ -10,7 +10,7 @@ contracts/                领域模型、接口契约
 product/                  用户流程、页面状态
 project/                  任务拆解、开发顺序
 acceptance/               验收标准、测试清单
-collaboration/            AI 协作规则
+collaboration/            AI 协作规则、军师协作手册
 adr/                      技术决策记录
 ops/                      部署与环境
 samples/                  样例策略、样例数据、回归样例
@@ -29,6 +29,7 @@ samples/                  样例策略、样例数据、回归样例
 8. `project/task-breakdown-and-development-order.md`
 9. `acceptance/acceptance-criteria-and-test-checklist.md`
 10. `collaboration/ai-collaboration-rules.md`
+11. `collaboration/agent-commander-playbook.md`
 
 ### P1：现在先写骨架，开发中持续补全
 1. `project/session-handoff.md`

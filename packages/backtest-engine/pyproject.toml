@@ -1,0 +1,19 @@
+[project]
+name = "hypothesis-lab-backtest-engine"
+version = "0.1.0"
+description = "Hypothesis Lab backtest engine"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "src",
+]
+testpaths = [
+    "tests",
+]
