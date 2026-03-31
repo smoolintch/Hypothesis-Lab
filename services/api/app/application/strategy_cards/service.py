@@ -14,8 +14,11 @@ from app.infrastructure.database.repositories.strategy_card import StrategyCardR
 from app.schemas.strategy_cards import (
     BacktestRangePayload,
     StrategyCardDetailResponse,
+    StrategyCardListResponse,
+    StrategyCardSummaryResponse,
     StrategyCardUpsertPayload,
     StrategyRuleSetPayload,
+    PaginationMeta,
 )
 
 
@@ -105,4 +108,33 @@ class StrategyCardService:
             fee_rate=float(record.fee_rate),
             rule_set=StrategyRuleSetPayload.model_validate(record.rule_set),
             created_at=coerce_utc(record.created_at),
+        )
+
+    def list_cards(
+        self,
+        *,
+        status: str | None = None,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> StrategyCardListResponse:
+        items, total = self.repository.list_paginated(
+            user_id=self.settings.default_user_id,
+            status=status,
+            page=page,
+            page_size=page_size,
+        )
+        return StrategyCardListResponse(
+            items=[
+                StrategyCardSummaryResponse(
+                    id=r.id,
+                    name=r.name,
+                    symbol=r.symbol,
+                    timeframe=r.timeframe,
+                    status=r.status,
+                    updated_at=coerce_utc(r.updated_at),
+                    latest_backtest_run_id=r.latest_backtest_run_id,
+                )
+                for r in items
+            ],
+            pagination=PaginationMeta(page=page, page_size=page_size, total=total),
         )

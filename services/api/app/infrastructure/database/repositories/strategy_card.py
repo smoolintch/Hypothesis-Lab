@@ -94,3 +94,25 @@ class StrategyCardRepository:
         self.session.add(record)
         self.session.flush()
         return record
+
+    def list_paginated(
+        self,
+        *,
+        user_id: UUID,
+        status: str | None = None,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> tuple[list[StrategyCardModel], int]:
+        query = self.session.query(StrategyCardModel).filter(
+            StrategyCardModel.user_id == user_id,
+        )
+        if status is not None:
+            query = query.filter(StrategyCardModel.status == status)
+        total: int = query.count()
+        items = (
+            query.order_by(StrategyCardModel.updated_at.desc())
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+            .all()
+        )
+        return items, total

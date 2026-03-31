@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Depends, status
+from fastapi import APIRouter, Body, Depends, Query, status
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 
@@ -13,7 +13,11 @@ from app.infrastructure.database import get_session
 from app.schemas.backtests import BacktestRunResponse
 from app.schemas.common import SuccessResponse
 from app.schemas.conclusions import ConclusionResponse, ConclusionUpsertPayload
-from app.schemas.strategy_cards import StrategyCardDetailResponse, StrategyCardUpsertPayload
+from app.schemas.strategy_cards import (
+    StrategyCardDetailResponse,
+    StrategyCardListResponse,
+    StrategyCardUpsertPayload,
+)
 
 router = APIRouter(prefix="/strategy-cards", tags=["strategy-cards"])
 
@@ -47,6 +51,21 @@ def create_strategy_card(
 ) -> SuccessResponse[StrategyCardDetailResponse]:
     detail = service.create(payload)
     return SuccessResponse[StrategyCardDetailResponse](data=detail)
+
+
+@router.get(
+    "",
+    response_model=SuccessResponse[StrategyCardListResponse],
+    status_code=status.HTTP_200_OK,
+)
+def list_strategy_cards(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    status_filter: str | None = Query(default=None, alias="status"),
+    service: StrategyCardService = Depends(get_strategy_card_service),
+) -> SuccessResponse[StrategyCardListResponse]:
+    result = service.list_cards(status=status_filter, page=page, page_size=page_size)
+    return SuccessResponse[StrategyCardListResponse](data=result)
 
 
 @router.get(

@@ -41,20 +41,15 @@
 
 ## 4. 当前最优先任务
 1. 阶段 3 已正式通过（2026-03-31）——三条主链路全部成立，14/14 E2E + 43/43 集成测试全部通过
-2. **立即执行阶段收尾 checkpoint commit + push**（阶段 2 + 阶段 3 全部变更均未提交）
-3. 切入阶段 4：策略列表、复制策略卡、最近回测记录
-4. Stage 4 早期同步补齐（非阻断性遗留项）：
-   - 结论刷新后加载（`GET /api/conclusions` + 前端查询层）
-   - `/handbook` 实际列表视图（`GET /api/handbook` + 前端列表组件）
+2. 阶段 4「策略列表」后端已落地并通过验收（2026-03-31）：`GET /api/strategy-cards` 已可用（分页 + 状态筛选 + 按 `updated_at` 倒序），9/9 集成测试通过，全套 52/52 通过
+3. 下一步：前端接入策略列表页（`/strategy-cards` 页面 + 策略卡列表组件）
 
-阶段 2 主链路已正式验收通过（2026-03-30）。
-**⚠️ 注意：阶段 2 + 阶段 3 代码均尚未 checkpoint commit，强烈建议立即执行。**
+阶段 2 主链路已正式验收通过（2026-03-30）。阶段 3 已正式通过（2026-03-31）。
 
 ## 5. 当前推荐的下一步
-1. **立即**：阶段收尾 checkpoint commit + push（`packages/backtest-engine/`、`services/api`、`apps/web`、`docs` 全部变更）
-2. 进入阶段 4：策略卡列表（`GET /api/strategy-cards` + `/strategy-cards` 前端页面）
-3. 进入阶段 4：编辑/复制/删除策略卡
-4. 早期补齐遗留项：结论加载 + `/handbook` 列表
+1. 前端接入策略列表页（`/strategy-cards` 页面，调用 `GET /api/strategy-cards`，展示卡片列表 + 分页 + 新建入口）
+2. 进入阶段 4：复制策略卡（`POST /api/strategy-cards/{id}/duplicate`）
+3. 早期补齐遗留项：结论加载 + `/handbook` 列表
 
 ## 6. 当前未决问题
 1. 本地数据库采用容器方式还是本地安装方式，尚未最终记录
@@ -120,6 +115,7 @@
 58. 已在 `services/api` 落地「加入交易手册」最小后端：`HandbookEntryModel`（`handbook_entries` 表）、`HandbookEntryRepository`、`HandbookService`、`POST /api/handbook`（`201`）；前置校验 `conclusion.next_action == "add_to_handbook"`（否则 `422 CONCLUSION_NOT_ELIGIBLE_FOR_HANDBOOK`）、唯一约束保证每条结论只能加入一次（`409 HANDBOOK_ENTRY_ALREADY_EXISTS`）；已通过 7 个集成测试（成功路径、无 memo、重复冲突、不存在结论、不符合资格、memo 过长、联动 ID 校验），全套 43 个测试 100% 通过。
 59. 已在 `apps/web` 落地「加入交易手册」最小前端闭环：结论保存成功（`SavedConclusionView`）后，当 `next_action === "add_to_handbook"` 时展示手册区块，含可选 `memo` 文本域和"加入交易手册"按钮；调用 `POST /api/handbook`；保存中 / 保存成功（转只读摘要 + 前往手册页链接）/ 保存失败（含 `HANDBOOK_ENTRY_ALREADY_EXISTS`、`CONCLUSION_NOT_ELIGIBLE_FOR_HANDBOOK` 文案）三种状态均有反馈；build / typecheck / lint 零错误通过。
 60. 已在 `apps/web` 新增 `/handbook` 最小承接页（`apps/web/src/app/handbook/page.tsx`）：路由从 404 变为可用静态页面；页面承认「加入交易手册」功能已开通、说明手册条目列表将在后续版本提供（后端 `GET /api/handbook` 尚未实现，不伪造数据）；含 `data-testid="handbook-page"`、`data-testid="handbook-placeholder"`；typecheck / lint / build 零错误通过。
+61. 已在 `services/api` 落地「策略列表」最小后端：`StrategyCardRepository.list_paginated()`（按 `updated_at` 倒序、`status` 可选筛选、offset/limit 分页）、`StrategyCardService.list_cards()`、`GET /api/strategy-cards`（`200`，返回 `StrategyCardSummaryResponse[]` + `PaginationMeta`）；新增 `StrategyCardSummaryResponse`、`StrategyCardListResponse`、`PaginationMeta` 三个 schema；`page_size` 最大 100；9 个集成测试（空列表、有数据、字段子集校验、按更新时间倒序、分页边界、状态筛选、反映最新回测 run）全部通过；全套 52/52 通过。
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`

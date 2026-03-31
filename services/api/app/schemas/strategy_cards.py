@@ -96,3 +96,30 @@ class StrategyCardDetailResponse(BaseModel):
     fee_rate: float
     rule_set: StrategyRuleSetPayload
     created_at: datetime
+
+
+class StrategyCardSummaryResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: UUID
+    name: str
+    symbol: str
+    timeframe: str
+    status: str
+    updated_at: datetime
+    latest_backtest_run_id: UUID | None = None
+
+
+class PaginationMeta(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    page: int
+    page_size: int
+    total: int
+
+
+class StrategyCardListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    items: list[StrategyCardSummaryResponse]
+    pagination: PaginationMeta
