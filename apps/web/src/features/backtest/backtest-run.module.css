@@ -290,6 +290,146 @@
   font-size: 0.75rem;
 }
 
+/* ─── conclusion form ────────────────────────────────────────── */
+
+.conclusionForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.conclusionSaved {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.conclusionSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.conclusionRow {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+/* cf = conclusion form field prefix */
+.cfField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cfLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.cfRequired {
+  color: #f87171;
+  margin-left: 2px;
+}
+
+.cfHint {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.cfCheckboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.cfCheckbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cfSelect {
+  width: 100%;
+  max-width: 280px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.cfSelect:disabled {
+  opacity: 0.5;
+}
+
+.cfTextarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.cfTextarea:disabled {
+  opacity: 0.5;
+}
+
+.cfTextarea::placeholder {
+  color: var(--muted);
+}
+
+.cfError {
+  color: #f87171;
+  font-size: 0.8rem;
+}
+
+.cfActions {
+  display: flex;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.cfSubmitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.cfSubmitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cfSubmitButton:not(:disabled):hover {
+  opacity: 0.85;
+}
+
 /* ─── responsive ─────────────────────────────────────────────── */
 
 @media (max-width: 720px) {
@@ -303,5 +443,13 @@
 
   .metricsGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .conclusionRow {
+    grid-template-columns: 1fr;
+  }
+
+  .cfSelect {
+    max-width: 100%;
   }
 }

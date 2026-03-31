@@ -58,3 +58,40 @@ export interface BacktestResultResponse {
   result_summary: Record<string, unknown>;
   created_at: string;
 }
+
+export type ConclusionNextAction =
+  | "rerun"
+  | "refine_rules"
+  | "observe_only"
+  | "add_to_handbook"
+  | "discard";
+
+export const CONCLUSION_NEXT_ACTION_LABELS: Record<ConclusionNextAction, string> = {
+  rerun: "重新回测",
+  refine_rules: "优化规则",
+  observe_only: "仅观察",
+  add_to_handbook: "加入交易手册",
+  discard: "放弃此策略",
+};
+
+export interface ConclusionUpsertPayload {
+  backtest_result_id: string;
+  is_worth_researching: boolean;
+  can_accept_drawdown: boolean;
+  market_condition_notes?: string;
+  next_action: ConclusionNextAction;
+  notes?: string;
+}
+
+export interface ConclusionResponse {
+  id: string;
+  strategy_card_id: string;
+  backtest_result_id: string;
+  is_worth_researching: boolean;
+  can_accept_drawdown: boolean;
+  market_condition_notes: string | null;
+  next_action: ConclusionNextAction;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}

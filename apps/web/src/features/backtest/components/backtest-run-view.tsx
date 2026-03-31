@@ -8,6 +8,7 @@ import { ApiClientError } from "@/lib/api/client";
 import { useBacktestResultQuery, useBacktestRunQuery } from "../api";
 import styles from "../backtest-run.module.css";
 import { BacktestResultSection } from "./backtest-result-section";
+import { ConclusionForm } from "./conclusion-form";
 
 function formatDateTime(value: string) {
   const date = new Date(value);
@@ -284,6 +285,16 @@ export function BacktestRunView() {
             {resultQuery.data && (
               <section className={styles.panel} data-testid="backtest-result-panel">
                 <BacktestResultSection result={resultQuery.data} />
+              </section>
+            )}
+
+            {/* 结论区块：仅在结果成功后显示 */}
+            {resultQuery.data && (
+              <section className={styles.panel} data-testid="conclusion-section">
+                <ConclusionForm
+                  resultId={resultQuery.data.result_id}
+                  strategyCardId={data.strategy_card_id}
+                />
               </section>
             )}
           </>

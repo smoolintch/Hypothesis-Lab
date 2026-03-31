@@ -2,7 +2,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { apiRequest } from "@/lib/api/client";
 
-import type { BacktestResultResponse, BacktestRunResponse } from "./types";
+import type {
+  BacktestResultResponse,
+  BacktestRunResponse,
+  ConclusionResponse,
+  ConclusionUpsertPayload,
+} from "./types";
 
 export const backtestRunQueryKey = (runId: string) =>
   ["backtest-run", runId] as const;
@@ -23,6 +28,19 @@ export async function getBacktestRun(runId: string) {
 
 export async function getBacktestResult(runId: string) {
   return apiRequest<BacktestResultResponse>(`/backtests/${runId}/result`);
+}
+
+export async function createConclusion(
+  strategyCardId: string,
+  payload: ConclusionUpsertPayload,
+) {
+  return apiRequest<ConclusionResponse>(
+    `/strategy-cards/${strategyCardId}/conclusions`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
 }
 
 export function useBacktestRunQuery(runId: string | undefined) {
@@ -46,6 +64,15 @@ export function useBacktestResultQuery(runId: string | undefined, enabled: boole
     queryFn: () => getBacktestResult(runId as string),
     enabled: Boolean(runId) && enabled,
     retry: false,
+  });
+}
+
+export function useCreateConclusionMutation(strategyCardId: string | undefined) {
+  return useMutation({
+    mutationFn: (payload: ConclusionUpsertPayload) => {
+      if (!strategyCardId) throw new Error("Strategy card id is missing.");
+      return createConclusion(strategyCardId, payload);
+    },
   });
 }
 
