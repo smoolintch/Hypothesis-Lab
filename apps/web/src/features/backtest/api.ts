@@ -2,10 +2,13 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { apiRequest } from "@/lib/api/client";
 
-import type { BacktestRunResponse } from "./types";
+import type { BacktestResultResponse, BacktestRunResponse } from "./types";
 
 export const backtestRunQueryKey = (runId: string) =>
   ["backtest-run", runId] as const;
+
+export const backtestResultQueryKey = (runId: string) =>
+  ["backtest-result", runId] as const;
 
 export async function startBacktest(strategyCardId: string) {
   return apiRequest<BacktestRunResponse>(`/strategy-cards/${strategyCardId}/backtests`, {
@@ -16,6 +19,10 @@ export async function startBacktest(strategyCardId: string) {
 
 export async function getBacktestRun(runId: string) {
   return apiRequest<BacktestRunResponse>(`/backtests/${runId}`);
+}
+
+export async function getBacktestResult(runId: string) {
+  return apiRequest<BacktestResultResponse>(`/backtests/${runId}/result`);
 }
 
 export function useBacktestRunQuery(runId: string | undefined) {
@@ -30,6 +37,15 @@ export function useBacktestRunQuery(runId: string | undefined) {
       }
       return false;
     },
+  });
+}
+
+export function useBacktestResultQuery(runId: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: runId ? backtestResultQueryKey(runId) : ["backtest-result", "idle"],
+    queryFn: () => getBacktestResult(runId as string),
+    enabled: Boolean(runId) && enabled,
+    retry: false,
   });
 }
 

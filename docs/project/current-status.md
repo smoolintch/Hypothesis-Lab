@@ -40,17 +40,17 @@
 11. MVP 核心范围：策略假设卡、回测、结果、结论、交易手册
 
 ## 4. 当前最优先任务
-1. 进入阶段 3：实现结果页可读展示（核心指标卡片、资金曲线、交易明细）
-2. 实现 `GET /api/backtests/{run_id}/result` 的前端消费（结果页展示真实指标）
-3. 实现结论填写与保存（`POST /api/strategy-cards/{id}/conclusions`）
+1. 结果页阶段 3 首个里程碑已完成：真实结果消费、指标卡片、曲线、交易明细均已接入
+2. 下一步：实现结论填写与保存（`POST /api/strategy-cards/{id}/conclusions`）
+3. 进一步：实现加入交易手册（`POST /api/handbook`）完成认知闭环
 
 阶段 2 主链路（真实回测执行 + `BacktestResult` 持久化 + 结果读取）已正式验收通过（2026-03-30），可进入阶段 3。
 **⚠️ 注意：阶段 2 代码尚未 checkpoint commit**：`packages/backtest-engine/` 全部文件未跟踪，`services/api/pyproject.toml` 与 `uv.lock` 有未提交修改，进入阶段 3 前应先做 checkpoint commit。
 
 ## 5. 当前推荐的下一步
-1. 前端（`apps/web`）的结果页 `/backtests/{run_id}` 接入 `GET /api/backtests/{run_id}/result`，展示真实指标
-2. 实现阶段 3 核心结果页：核心指标卡片、资金曲线（ECharts）、交易明细列表
-3. 实现结论填写与保存（`POST /api/strategy-cards/{id}/conclusions`）
+1. 实现结论填写与保存（前端表单 + `POST /api/strategy-cards/{id}/conclusions`）
+2. 实现更新结论（`PUT /api/conclusions/{id}`）
+3. 实现加入交易手册（`POST /api/handbook`），完成完整认知闭环
 4. 将回测引擎执行集成测试纳入固定回归基线
 
 ## 6. 当前未决问题
@@ -112,7 +112,7 @@
 51. 已在 `services/api` 接入 `packages/backtest-engine` 真实回测执行：`BacktestRunService.start_backtest_for_strategy_card` 现在同步执行真实回测（`run_backtest`）并将结果持久化为 `BacktestResult`；`BacktestRun.status` 更新为 `succeeded`（成功）或 `failed`（失败并记录 `error_code`/`error_message`）
 52. 已落地 `BacktestResult` 最小持久化：新增 `backtest_results` 表（Alembic 迁移 `20260330_01`）与 `BacktestResultModel`/`BacktestResultRepository`，字段覆盖 `summary_metrics`、`equity_curve`、`drawdown_curve`、`trades`、`result_summary`（阶段 2 为空 `{}`）、`dataset_version`
 53. 已落地 `GET /api/backtests/{run_id}/result` 接口，返回 `BacktestResultResponse`；`BacktestRunResponse.result_url` 在 `succeeded` 时自动填充为 `/api/backtests/{run_id}/result`
-54. 已新增 `services/api/tests/integration/test_backtest_real_execution.py`（6 个集成测试，覆盖 succeeded 状态、真实指标结构、结果一致性、409/422/404 错误态）；更新 `test_backtests_placeholder.py`（修正 backtest_range 日期匹配 fixture 覆盖范围）；全部 20 个 API 集成测试通过
+55. 已在 `apps/web` 升级回测结果页 `/backtests/{run_id}`：`status = succeeded` 时调用 `GET /api/backtests/{run_id}/result`，展示真实核心指标卡片（7 项）、SVG 资金曲线与回撤曲线、最近 20 笔交易明细；各状态（queued / running / failed / succeeded-no-result / succeeded-with-result）均有对应 UI；build / typecheck / lint 零错误通过。
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`

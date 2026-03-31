@@ -115,6 +115,183 @@
   cursor: pointer;
 }
 
+/* ─── result section ─────────────────────────────────────────── */
+
+.resultBlock {
+  margin-top: 28px;
+}
+
+.resultSkeleton {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  margin-top: 16px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.sectionBadge {
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+/* metrics grid */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.metricCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.metricLabel {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.metricValue {
+  font-size: 1.1rem;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.metric_positive .metricValue {
+  color: #4ade80;
+}
+
+.metric_negative .metricValue {
+  color: #f87171;
+}
+
+.metric_neutral .metricValue {
+  color: var(--foreground);
+}
+
+/* chart */
+.chartBlock {
+  margin-bottom: 16px;
+}
+
+.chartLabel {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.chartSvg {
+  display: block;
+  width: 100%;
+  height: 120px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  overflow: visible;
+}
+
+.chartEmpty {
+  color: var(--muted);
+  font-size: 0.875rem;
+  padding: 16px 0;
+}
+
+/* CSS custom props for chart colors — fallback if global vars absent */
+:root {
+  --color-equity: #4ade80;
+  --color-drawdown: #f87171;
+}
+
+/* trades table */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.table th {
+  padding: 8px 10px;
+  text-align: left;
+  color: var(--muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.tdMono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  white-space: nowrap;
+}
+
+.tdNum {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tdReason {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.profit {
+  color: #4ade80;
+}
+
+.loss {
+  color: #f87171;
+}
+
+.tableNote {
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.resultMeta {
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+/* ─── responsive ─────────────────────────────────────────────── */
+
 @media (max-width: 720px) {
   .page {
     padding: 24px 16px 48px;
@@ -122,5 +299,9 @@
 
   .panel {
     padding: 20px;
+  }
+
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

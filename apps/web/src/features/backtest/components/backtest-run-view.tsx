@@ -5,8 +5,9 @@ import { useParams } from "next/navigation";
 
 import { ApiClientError } from "@/lib/api/client";
 
-import { useBacktestRunQuery } from "../api";
+import { useBacktestResultQuery, useBacktestRunQuery } from "../api";
 import styles from "../backtest-run.module.css";
+import { BacktestResultSection } from "./backtest-result-section";
 
 function formatDateTime(value: string) {
   const date = new Date(value);
@@ -25,8 +26,16 @@ function formatDateTime(value: string) {
 export function BacktestRunView() {
   const params = useParams<{ run_id: string }>();
   const runId = typeof params?.run_id === "string" ? params.run_id : undefined;
-  const query = useBacktestRunQuery(runId);
 
+  const runQuery = useBacktestRunQuery(runId);
+  const runData = runQuery.data;
+  const isSucceeded = runData?.status === "succeeded";
+  const hasResultUrl = Boolean(runData?.result_url);
+
+  // 只在 succeeded + result_url 存在时才拉结果
+  const resultQuery = useBacktestResultQuery(runId, isSucceeded && hasResultUrl);
+
+  // ── 缺少 run_id ──
   if (!runId) {
     return (
       <main className={styles.page} data-testid="backtest-run-page">
@@ -37,14 +46,14 @@ export function BacktestRunView() {
     );
   }
 
-  if (query.isPending) {
+  // ── run 加载中 ──
+  if (runQuery.isPending) {
     return (
       <main className={styles.page} data-testid="backtest-run-page">
         <div className={styles.container}>
           <header className={styles.header}>
             <p className={styles.eyebrow}>Backtest</p>
             <h1 className={styles.title}>回测运行</h1>
-            <p className={styles.subtitle}>正在从真实 API 加载回测运行信息。</p>
           </header>
           <section
             className={`${styles.panel} ${styles.statePanel}`}
@@ -60,10 +69,11 @@ export function BacktestRunView() {
     );
   }
 
-  if (query.error) {
+  // ── run 加载失败 ──
+  if (runQuery.error) {
     const err =
-      query.error instanceof ApiClientError
-        ? query.error
+      runQuery.error instanceof ApiClientError
+        ? runQuery.error
         : new ApiClientError({
             status: 500,
             fallbackMessage: "加载回测运行失败。",
@@ -95,7 +105,7 @@ export function BacktestRunView() {
                 <button
                   className={styles.linkButton}
                   type="button"
-                  onClick={() => query.refetch()}
+                  onClick={() => runQuery.refetch()}
                 >
                   重试
                 </button>
@@ -110,7 +120,7 @@ export function BacktestRunView() {
     );
   }
 
-  const data = query.data;
+  const data = runData!;
   const status = data.status;
 
   return (
@@ -118,12 +128,10 @@ export function BacktestRunView() {
       <div className={styles.container}>
         <header className={styles.header}>
           <p className={styles.eyebrow}>Backtest</p>
-          <h1 className={styles.title}>回测运行</h1>
-          <p className={styles.subtitle}>
-            本页仅绑定真实 API 状态；指标与曲线尚未接入，不展示伪造结果。
-          </p>
+          <h1 className={styles.title}>回测结果</h1>
         </header>
 
+        {/* ── run 基础信息 ── */}
         <section className={styles.panel}>
           <div className={styles.kv}>
             <span className={styles.label}>run_id</span>
@@ -138,83 +146,77 @@ export function BacktestRunView() {
             </span>
           </div>
           <div className={styles.kv}>
-            <span className={styles.label}>strategy_card_id</span>
+            <span className={styles.label}>策略卡</span>
             <span className={styles.valueMono}>{data.strategy_card_id}</span>
           </div>
           <div className={styles.kv}>
-            <span className={styles.label}>strategy_snapshot_id</span>
-            <span className={styles.valueMono}>{data.strategy_snapshot_id}</span>
-          </div>
-          <div className={styles.kv}>
-            <span className={styles.label}>created_at</span>
+            <span className={styles.label}>创建时间</span>
             <span className={styles.value}>{formatDateTime(data.created_at)}</span>
           </div>
 
-          {status === "queued" ? (
+          {/* queued */}
+          {status === "queued" && (
             <div
               className={`${styles.message} ${styles.messageNeutral}`}
               data-testid="backtest-run-state-queued"
             >
-              <p>回测已排队（queued），当前后端不执行真实回测，状态可能长期保持在此。</p>
+              <p>回测已提交，正在等待执行。</p>
             </div>
-          ) : null}
+          )}
 
-          {status === "running" ? (
+          {/* running */}
+          {status === "running" && (
             <div
               className={`${styles.message} ${styles.messageNeutral}`}
               data-testid="backtest-run-state-running"
             >
-              <p>回测运行中（running）。结果指标尚未接入，本页仅展示状态轮询占位。</p>
+              <p>回测执行中，请稍候…</p>
             </div>
-          ) : null}
+          )}
 
-          {status === "failed" ? (
+          {/* failed */}
+          {status === "failed" && (
             <div
               className={`${styles.message} ${styles.messageError}`}
               data-testid="backtest-run-state-failed"
             >
-              <p>回测失败（failed）。</p>
-              {data.error_code ? (
+              <p>回测失败，请检查策略参数或稍后重试。</p>
+              {data.error_code && (
                 <p className={styles.valueMono}>code: {data.error_code}</p>
-              ) : null}
-              {data.error_message ? <p>{data.error_message}</p> : null}
+              )}
+              {data.error_message && <p>{data.error_message}</p>}
             </div>
-          ) : null}
+          )}
 
-          {status === "cancelled" ? (
+          {/* cancelled */}
+          {status === "cancelled" && (
             <div
               className={`${styles.message} ${styles.messageWarn}`}
               data-testid="backtest-run-state-cancelled"
             >
-              <p>回测已取消（cancelled）。</p>
-              {data.error_message ? <p>{data.error_message}</p> : null}
+              <p>回测已取消。</p>
+              {data.error_message && <p>{data.error_message}</p>}
             </div>
-          ) : null}
+          )}
 
-          {status === "succeeded" ? (
+          {/* succeeded — result_url 缺失（异常态） */}
+          {status === "succeeded" && !hasResultUrl && (
             <div
-              className={`${styles.message} ${styles.messageSuccess}`}
-              data-testid="backtest-run-state-succeeded-placeholder"
+              className={`${styles.message} ${styles.messageWarn}`}
+              data-testid="backtest-run-state-no-result-url"
             >
-              <p>
-                状态为 succeeded，但当前阶段结果接口与指标展示尚未接入。请勿在此页伪造
-                BacktestResult；后续将基于真实结果接口扩展。
-              </p>
-              {data.result_url ? (
-                <p className={styles.valueMono}>result_url: {data.result_url}</p>
-              ) : (
-                <p className={styles.valueMono}>result_url: （空）</p>
-              )}
+              <p>回测已完成，但结果暂不可用。请稍后刷新或重新发起回测。</p>
             </div>
-          ) : null}
+          )}
 
+          {/* unknown status */}
           {!["queued", "running", "failed", "cancelled", "succeeded"].includes(
             String(status),
-          ) ? (
+          ) && (
             <div className={`${styles.message} ${styles.messageWarn}`}>
               <p>未知状态：{String(status)}</p>
             </div>
-          ) : null}
+          )}
 
           <div className={styles.inlineActions}>
             <Link
@@ -225,6 +227,67 @@ export function BacktestRunView() {
             </Link>
           </div>
         </section>
+
+        {/* ── succeeded：结果区块 ── */}
+        {status === "succeeded" && hasResultUrl && (
+          <>
+            {/* 结果加载中 */}
+            {resultQuery.isPending && (
+              <section
+                className={`${styles.panel} ${styles.resultSkeleton}`}
+                data-testid="backtest-result-loading"
+              >
+                <p>正在加载结果…</p>
+              </section>
+            )}
+
+            {/* 结果加载失败 */}
+            {resultQuery.error && (() => {
+              const err =
+                resultQuery.error instanceof ApiClientError
+                  ? resultQuery.error
+                  : new ApiClientError({
+                      status: 500,
+                      fallbackMessage: "加载回测结果失败。",
+                    });
+              return (
+                <section
+                  className={`${styles.panel} ${styles.statePanel}`}
+                  data-testid="backtest-result-error"
+                >
+                  <div
+                    className={`${styles.message} ${styles.messageError}`}
+                    role="alert"
+                  >
+                    <p>
+                      {err.code === "BACKTEST_RESULT_NOT_READY"
+                        ? "回测结果尚未就绪，请稍后刷新。"
+                        : err.code === "BACKTEST_RESULT_UNAVAILABLE"
+                          ? "回测执行失败，无法提供结果。"
+                          : err.message}
+                    </p>
+                  </div>
+                  <div className={styles.inlineActions}>
+                    <button
+                      className={styles.linkButton}
+                      type="button"
+                      onClick={() => resultQuery.refetch()}
+                    >
+                      重试
+                    </button>
+                  </div>
+                </section>
+              );
+            })()}
+
+            {/* 结果成功 */}
+            {resultQuery.data && (
+              <section className={styles.panel} data-testid="backtest-result-panel">
+                <BacktestResultSection result={resultQuery.data} />
+              </section>
+            )}
+          </>
+        )}
       </div>
     </main>
   );
