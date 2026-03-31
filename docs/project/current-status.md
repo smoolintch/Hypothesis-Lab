@@ -1,7 +1,7 @@
 # 项目当前状态
 
 ## 1. 当前阶段
-`阶段 3：结果与沉淀链路（阶段级验收结论：有条件阶段通过；两个缺口需补齐后方可正式收尾）`
+`阶段 3 已正式通过（2026-03-31），建议做阶段收尾 checkpoint 后切入阶段 4`
 
 ## 2. 当前总体情况
 1. 产品定义与 MVP 功能清单已完成。
@@ -40,20 +40,21 @@
 11. MVP 核心范围：策略假设卡、回测、结果、结论、交易手册
 
 ## 4. 当前最优先任务
-1. 阶段 3「结论可保存」前后端均已正式验收通过（2026-03-30）
-2. 阶段 3「加入交易手册」后端已落地，前端最小闭环已落地（2026-03-31）
-3. 阶段 3 阶段级验收：**有条件通过**（2026-03-31）——两个缺口需补齐：
-   - 🔴 **`/handbook` 最小列表页**：`GET /api/handbook` 接口 + 前端页面（当前"前往交易手册"为死链）
-   - 🟡 **结论"再次查看"**：刷新后结论区块重置为空表单，需加载已保存结论
+1. 阶段 3 已正式通过（2026-03-31）——三条主链路全部成立，14/14 E2E + 43/43 集成测试全部通过
+2. **立即执行阶段收尾 checkpoint commit + push**（阶段 2 + 阶段 3 全部变更均未提交）
+3. 切入阶段 4：策略列表、复制策略卡、最近回测记录
+4. Stage 4 早期同步补齐（非阻断性遗留项）：
+   - 结论刷新后加载（`GET /api/conclusions` + 前端查询层）
+   - `/handbook` 实际列表视图（`GET /api/handbook` + 前端列表组件）
 
-阶段 2 主链路（真实回测执行 + `BacktestResult` 持久化 + 结果读取）已正式验收通过（2026-03-30），可进入阶段 3。
-**⚠️ 注意：阶段 2 代码尚未 checkpoint commit**：`packages/backtest-engine/` 全部文件未跟踪，`services/api/pyproject.toml` 与 `uv.lock` 有未提交修改，进入阶段 3 前应先做 checkpoint commit。
+阶段 2 主链路已正式验收通过（2026-03-30）。
+**⚠️ 注意：阶段 2 + 阶段 3 代码均尚未 checkpoint commit，强烈建议立即执行。**
 
 ## 5. 当前推荐的下一步
-1. 🔴 实现 `GET /api/handbook`（分页列表）+ `/handbook` 最小前端列表页（含空状态）——消除"前往交易手册"死链
-2. 🟡 实现结论加载（`GET /api/conclusions?backtest_result_id=xxx` 或等价）+ 结果页加载已保存结论——消除刷新状态丢失问题
-3. 完成以上两项后，做阶段 3 正式收尾 checkpoint 并切入阶段 4
-4. 实现更新结论（`PUT /api/conclusions/{id}`）——低优先级
+1. **立即**：阶段收尾 checkpoint commit + push（`packages/backtest-engine/`、`services/api`、`apps/web`、`docs` 全部变更）
+2. 进入阶段 4：策略卡列表（`GET /api/strategy-cards` + `/strategy-cards` 前端页面）
+3. 进入阶段 4：编辑/复制/删除策略卡
+4. 早期补齐遗留项：结论加载 + `/handbook` 列表
 
 ## 6. 当前未决问题
 1. 本地数据库采用容器方式还是本地安装方式，尚未最终记录
@@ -118,6 +119,7 @@
 57. 已在 `apps/web` 落地结论填写最小前端闭环：结果页 `/backtests/{run_id}` 在结果展示后新增结论区块，包含"值得继续研究"、"接受回撤"两个 checkbox、"下一步行动"下拉（5 项枚举）、"适用行情说明"（选填 textarea）和"备注"（选填 textarea）；保存调用 `POST /api/strategy-cards/{id}/conclusions`，覆盖保存中 / 保存成功（转只读摘要）/ 保存失败（含 CONCLUSION_ALREADY_EXISTS 文案）三种状态；build / typecheck / lint 零错误通过。
 58. 已在 `services/api` 落地「加入交易手册」最小后端：`HandbookEntryModel`（`handbook_entries` 表）、`HandbookEntryRepository`、`HandbookService`、`POST /api/handbook`（`201`）；前置校验 `conclusion.next_action == "add_to_handbook"`（否则 `422 CONCLUSION_NOT_ELIGIBLE_FOR_HANDBOOK`）、唯一约束保证每条结论只能加入一次（`409 HANDBOOK_ENTRY_ALREADY_EXISTS`）；已通过 7 个集成测试（成功路径、无 memo、重复冲突、不存在结论、不符合资格、memo 过长、联动 ID 校验），全套 43 个测试 100% 通过。
 59. 已在 `apps/web` 落地「加入交易手册」最小前端闭环：结论保存成功（`SavedConclusionView`）后，当 `next_action === "add_to_handbook"` 时展示手册区块，含可选 `memo` 文本域和"加入交易手册"按钮；调用 `POST /api/handbook`；保存中 / 保存成功（转只读摘要 + 前往手册页链接）/ 保存失败（含 `HANDBOOK_ENTRY_ALREADY_EXISTS`、`CONCLUSION_NOT_ELIGIBLE_FOR_HANDBOOK` 文案）三种状态均有反馈；build / typecheck / lint 零错误通过。
+60. 已在 `apps/web` 新增 `/handbook` 最小承接页（`apps/web/src/app/handbook/page.tsx`）：路由从 404 变为可用静态页面；页面承认「加入交易手册」功能已开通、说明手册条目列表将在后续版本提供（后端 `GET /api/handbook` 尚未实现，不伪造数据）；含 `data-testid="handbook-page"`、`data-testid="handbook-placeholder"`；typecheck / lint / build 零错误通过。
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`
