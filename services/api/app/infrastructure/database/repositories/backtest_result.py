@@ -56,3 +56,18 @@ class BacktestResultRepository:
             )
             .one_or_none()
         )
+
+    def get_by_id_for_user(
+        self,
+        *,
+        result_id: UUID,
+        user_id: UUID,
+    ) -> BacktestResultModel | None:
+        return (
+            self.session.query(BacktestResultModel)
+            .filter(
+                BacktestResultModel.id == result_id,
+                BacktestResultModel.user_id == user_id,
+            )
+            .one_or_none()
+        )

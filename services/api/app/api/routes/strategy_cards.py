@@ -7,10 +7,12 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 
 from app.application.backtests.service import BacktestRunService
+from app.application.conclusions.service import ConclusionService
 from app.application.strategy_cards.service import StrategyCardService
 from app.infrastructure.database import get_session
 from app.schemas.backtests import BacktestRunResponse
 from app.schemas.common import SuccessResponse
+from app.schemas.conclusions import ConclusionResponse, ConclusionUpsertPayload
 from app.schemas.strategy_cards import StrategyCardDetailResponse, StrategyCardUpsertPayload
 
 router = APIRouter(prefix="/strategy-cards", tags=["strategy-cards"])
@@ -28,6 +30,10 @@ def get_strategy_card_service(
 
 def get_backtest_run_service(session: Session = Depends(get_session)) -> BacktestRunService:
     return BacktestRunService(session)
+
+
+def get_conclusion_service(session: Session = Depends(get_session)) -> ConclusionService:
+    return ConclusionService(session)
 
 
 @router.post(
@@ -82,3 +88,17 @@ def start_backtest(
 ) -> SuccessResponse[BacktestRunResponse]:
     detail = service.start_backtest_for_strategy_card(strategy_card_id)
     return SuccessResponse[BacktestRunResponse](data=detail)
+
+
+@router.post(
+    "/{strategy_card_id}/conclusions",
+    response_model=SuccessResponse[ConclusionResponse],
+    status_code=status.HTTP_201_CREATED,
+)
+def create_conclusion(
+    strategy_card_id: UUID,
+    payload: ConclusionUpsertPayload,
+    service: ConclusionService = Depends(get_conclusion_service),
+) -> SuccessResponse[ConclusionResponse]:
+    detail = service.create_conclusion(strategy_card_id, payload)
+    return SuccessResponse[ConclusionResponse](data=detail)

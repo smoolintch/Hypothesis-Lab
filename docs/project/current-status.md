@@ -1,7 +1,7 @@
 # 项目当前状态
 
 ## 1. 当前阶段
-`阶段 3：结果与沉淀链路（阶段 2 已正式验收通过，可进入阶段 3）`
+`阶段 3：结果与沉淀链路（阶段 2 已正式验收通过，阶段 3 结论保存后端已落地）`
 
 ## 2. 当前总体情况
 1. 产品定义与 MVP 功能清单已完成。
@@ -40,15 +40,15 @@
 11. MVP 核心范围：策略假设卡、回测、结果、结论、交易手册
 
 ## 4. 当前最优先任务
-1. 结果页阶段 3 首个里程碑已完成：真实结果消费、指标卡片、曲线、交易明细均已接入
-2. 下一步：实现结论填写与保存（`POST /api/strategy-cards/{id}/conclusions`）
+1. 阶段 3 结论保存后端已完成：`POST /api/strategy-cards/{id}/conclusions` 已可用
+2. 下一步：前端接入结论填写表单（`apps/web` 结果页 `/backtests/{run_id}` 添加结论输入区块）
 3. 进一步：实现加入交易手册（`POST /api/handbook`）完成认知闭环
 
 阶段 2 主链路（真实回测执行 + `BacktestResult` 持久化 + 结果读取）已正式验收通过（2026-03-30），可进入阶段 3。
 **⚠️ 注意：阶段 2 代码尚未 checkpoint commit**：`packages/backtest-engine/` 全部文件未跟踪，`services/api/pyproject.toml` 与 `uv.lock` 有未提交修改，进入阶段 3 前应先做 checkpoint commit。
 
 ## 5. 当前推荐的下一步
-1. 实现结论填写与保存（前端表单 + `POST /api/strategy-cards/{id}/conclusions`）
+1. 前端接入结论填写表单（结果页 `/backtests/{run_id}` 添加结论区块，调用 `POST /api/strategy-cards/{id}/conclusions`）
 2. 实现更新结论（`PUT /api/conclusions/{id}`）
 3. 实现加入交易手册（`POST /api/handbook`），完成完整认知闭环
 4. 将回测引擎执行集成测试纳入固定回归基线
@@ -113,6 +113,7 @@
 52. 已落地 `BacktestResult` 最小持久化：新增 `backtest_results` 表（Alembic 迁移 `20260330_01`）与 `BacktestResultModel`/`BacktestResultRepository`，字段覆盖 `summary_metrics`、`equity_curve`、`drawdown_curve`、`trades`、`result_summary`（阶段 2 为空 `{}`）、`dataset_version`
 53. 已落地 `GET /api/backtests/{run_id}/result` 接口，返回 `BacktestResultResponse`；`BacktestRunResponse.result_url` 在 `succeeded` 时自动填充为 `/api/backtests/{run_id}/result`
 55. 已在 `apps/web` 升级回测结果页 `/backtests/{run_id}`：`status = succeeded` 时调用 `GET /api/backtests/{run_id}/result`，展示真实核心指标卡片（7 项）、SVG 资金曲线与回撤曲线、最近 20 笔交易明细；各状态（queued / running / failed / succeeded-no-result / succeeded-with-result）均有对应 UI；build / typecheck / lint 零错误通过。
+56. 已在 `services/api` 落地结论保存最小后端：`ConclusionModel`（`conclusions` 表）、`ConclusionRepository`、`ConclusionService`、`POST /api/strategy-cards/{id}/conclusions`（`201`）；支持 `is_worth_researching`、`can_accept_drawdown`、`market_condition_notes`（0-2000）、`next_action`（五个枚举值）、`notes`（0-4000）；唯一约束保证每个 `BacktestResult` 只有一条结论；已通过 10 个集成测试（成功路径、最小字段、重复冲突、跨卡错误、字段校验）。
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`

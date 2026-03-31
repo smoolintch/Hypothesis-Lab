@@ -58,3 +58,23 @@ class BacktestResultUnavailableError(AppError):
             details={"run_id": run_id},
         )
 
+
+class BacktestResultNotFoundError(AppError):
+    def __init__(self, result_id: str) -> None:
+        super().__init__(
+            status_code=404,
+            code="BACKTEST_RESULT_NOT_FOUND",
+            message="Backtest result was not found.",
+            details={"result_id": result_id},
+        )
+
+
+class ConclusionAlreadyExistsError(AppError):
+    def __init__(self, backtest_result_id: str) -> None:
+        super().__init__(
+            status_code=409,
+            code="CONCLUSION_ALREADY_EXISTS",
+            message="A conclusion already exists for this backtest result.",
+            details={"backtest_result_id": backtest_result_id},
+        )
+
