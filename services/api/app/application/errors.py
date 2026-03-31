@@ -78,3 +78,33 @@ class ConclusionAlreadyExistsError(AppError):
             details={"backtest_result_id": backtest_result_id},
         )
 
+
+class ConclusionNotFoundError(AppError):
+    def __init__(self, conclusion_id: str) -> None:
+        super().__init__(
+            status_code=404,
+            code="CONCLUSION_NOT_FOUND",
+            message="Conclusion was not found.",
+            details={"conclusion_id": conclusion_id},
+        )
+
+
+class ConclusionNotEligibleForHandbookError(AppError):
+    def __init__(self, conclusion_id: str) -> None:
+        super().__init__(
+            status_code=422,
+            code="CONCLUSION_NOT_ELIGIBLE_FOR_HANDBOOK",
+            message="Conclusion next_action must be 'add_to_handbook' to add it to the handbook.",
+            details={"conclusion_id": conclusion_id},
+        )
+
+
+class HandbookEntryAlreadyExistsError(AppError):
+    def __init__(self, conclusion_id: str) -> None:
+        super().__init__(
+            status_code=409,
+            code="HANDBOOK_ENTRY_ALREADY_EXISTS",
+            message="This conclusion has already been added to the handbook.",
+            details={"conclusion_id": conclusion_id},
+        )
+

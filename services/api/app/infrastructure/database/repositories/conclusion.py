@@ -58,3 +58,18 @@ class ConclusionRepository:
             )
             .one_or_none()
         )
+
+    def get_by_id_for_user(
+        self,
+        *,
+        conclusion_id: UUID,
+        user_id: UUID,
+    ) -> ConclusionModel | None:
+        return (
+            self.session.query(ConclusionModel)
+            .filter(
+                ConclusionModel.id == conclusion_id,
+                ConclusionModel.user_id == user_id,
+            )
+            .one_or_none()
+        )
