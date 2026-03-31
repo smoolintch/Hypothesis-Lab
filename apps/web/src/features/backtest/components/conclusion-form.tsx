@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,8 +8,8 @@ import { z } from "zod";
 
 import { ApiClientError } from "@/lib/api/client";
 
-import { useCreateConclusionMutation } from "../api";
-import type { ConclusionNextAction, ConclusionResponse } from "../types";
+import { useCreateConclusionMutation, useCreateHandbookEntryMutation } from "../api";
+import type { ConclusionNextAction, ConclusionResponse, HandbookEntryResponse } from "../types";
 import { CONCLUSION_NEXT_ACTION_LABELS } from "../types";
 import styles from "../backtest-run.module.css";
 
@@ -35,6 +36,27 @@ type ConclusionFormValues = z.infer<typeof conclusionSchema>;
 // ─── saved view ───────────────────────────────────────────────────────────────
 
 function SavedConclusionView({ conclusion }: { conclusion: ConclusionResponse }) {
+  const [memo, setMemo] = useState("");
+  const [handbookEntry, setHandbookEntry] = useState<HandbookEntryResponse | null>(null);
+  const handbookMutation = useCreateHandbookEntryMutation();
+
+  const isEligible = conclusion.next_action === "add_to_handbook";
+
+  const handbookErrorMessage = (() => {
+    if (!handbookMutation.error) return null;
+    const err =
+      handbookMutation.error instanceof ApiClientError
+        ? handbookMutation.error
+        : new ApiClientError({ status: 500, fallbackMessage: "加入手册失败。" });
+    if (err.code === "HANDBOOK_ENTRY_ALREADY_EXISTS") {
+      return "该结论已加入交易手册，无法重复加入。";
+    }
+    if (err.code === "CONCLUSION_NOT_ELIGIBLE_FOR_HANDBOOK") {
+      return '当前结论的下一步行动不是"加入交易手册"，无法加入。';
+    }
+    return err.message;
+  })();
+
   return (
     <div
       className={styles.conclusionSaved}
@@ -76,6 +98,74 @@ function SavedConclusionView({ conclusion }: { conclusion: ConclusionResponse })
           </div>
         )}
       </div>
+
+      {/* ── 加入交易手册区块（仅当 next_action === add_to_handbook 时展示） ── */}
+      {isEligible && (
+        <>
+          <hr className={styles.sectionDivider} />
+          {handbookEntry ? (
+            <div
+              className={`${styles.message} ${styles.messageSuccess}`}
+              data-testid="handbook-entry-saved"
+            >
+              <p>已加入交易手册。</p>
+              <div className={styles.inlineActions}>
+                <Link className={styles.linkButton} href="/handbook">
+                  前往交易手册
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.conclusionForm} data-testid="handbook-section">
+              <h3 className={styles.sectionTitle}>加入交易手册</h3>
+
+              <div className={styles.cfField}>
+                <label className={styles.cfLabel} htmlFor="handbook-memo">
+                  备注
+                  <span className={styles.cfHint}>（选填，最多 2000 字）</span>
+                </label>
+                <textarea
+                  id="handbook-memo"
+                  className={styles.cfTextarea}
+                  rows={3}
+                  placeholder="记录这条策略加入手册的原因或备注。"
+                  data-testid="handbook-memo"
+                  disabled={handbookMutation.isPending}
+                  value={memo}
+                  onChange={(e) => setMemo(e.target.value)}
+                />
+              </div>
+
+              {handbookErrorMessage && (
+                <div
+                  className={`${styles.message} ${styles.messageError}`}
+                  role="alert"
+                  data-testid="handbook-save-error"
+                >
+                  <p>{handbookErrorMessage}</p>
+                </div>
+              )}
+
+              <div className={styles.cfActions}>
+                <button
+                  type="button"
+                  className={styles.cfSubmitButton}
+                  disabled={handbookMutation.isPending}
+                  data-testid="handbook-submit-button"
+                  onClick={() => {
+                    handbookMutation.mutate(
+                      { conclusion_id: conclusion.id, memo: memo || undefined },
+                      { onSuccess: (data) => setHandbookEntry(data) },
+                    );
+                  }}
+                >
+                  {handbookMutation.isPending ? "加入中…" : "加入交易手册"}
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

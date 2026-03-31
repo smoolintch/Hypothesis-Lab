@@ -7,6 +7,8 @@ import type {
   BacktestRunResponse,
   ConclusionResponse,
   ConclusionUpsertPayload,
+  HandbookCreatePayload,
+  HandbookEntryResponse,
 } from "./types";
 
 export const backtestRunQueryKey = (runId: string) =>
@@ -73,6 +75,19 @@ export function useCreateConclusionMutation(strategyCardId: string | undefined) 
       if (!strategyCardId) throw new Error("Strategy card id is missing.");
       return createConclusion(strategyCardId, payload);
     },
+  });
+}
+
+export async function createHandbookEntry(payload: HandbookCreatePayload) {
+  return apiRequest<HandbookEntryResponse>("/handbook", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function useCreateHandbookEntryMutation() {
+  return useMutation({
+    mutationFn: (payload: HandbookCreatePayload) => createHandbookEntry(payload),
   });
 }
 

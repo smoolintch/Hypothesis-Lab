@@ -95,3 +95,19 @@ export interface ConclusionResponse {
   created_at: string;
   updated_at: string;
 }
+
+export interface HandbookCreatePayload {
+  conclusion_id: string;
+  memo?: string;
+}
+
+export interface HandbookEntryResponse {
+  id: string;
+  strategy_card_id: string;
+  backtest_result_id: string;
+  conclusion_id: string;
+  status: string;
+  memo: string | null;
+  created_at: string;
+  updated_at: string;
+}

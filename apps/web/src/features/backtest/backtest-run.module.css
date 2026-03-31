@@ -304,6 +304,12 @@
   gap: 16px;
 }
 
+.sectionDivider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
+}
+
 .conclusionSummary {
   display: flex;
   flex-direction: column;
