@@ -87,3 +87,21 @@ class RecentExperimentsResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     items: list[RecentExperimentItemResponse]
+
+
+class HistoricalBacktestItemResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    run_id: UUID
+    status: str
+    result_url: str | None
+    started_at: datetime | None
+    finished_at: datetime | None
+    created_at: datetime
+
+
+class HistoricalBacktestsResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    strategy_card_id: UUID
+    items: list[HistoricalBacktestItemResponse]

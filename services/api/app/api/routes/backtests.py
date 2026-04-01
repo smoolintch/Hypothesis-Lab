@@ -10,6 +10,7 @@ from app.infrastructure.database import get_session
 from app.schemas.backtests import (
     BacktestResultResponse,
     BacktestRunResponse,
+    HistoricalBacktestsResponse,
     RecentExperimentsResponse,
 )
 from app.schemas.common import SuccessResponse
@@ -31,6 +32,19 @@ def list_recent_experiments(
 ) -> SuccessResponse[RecentExperimentsResponse]:
     detail = service.list_recent_experiments()
     return SuccessResponse[RecentExperimentsResponse](data=detail)
+
+
+@router.get(
+    "/strategy-cards/{strategy_card_id}/history",
+    response_model=SuccessResponse[HistoricalBacktestsResponse],
+    status_code=status.HTTP_200_OK,
+)
+def list_strategy_card_history(
+    strategy_card_id: UUID,
+    service: BacktestRunService = Depends(get_backtest_run_service),
+) -> SuccessResponse[HistoricalBacktestsResponse]:
+    detail = service.list_history_for_strategy_card(strategy_card_id)
+    return SuccessResponse[HistoricalBacktestsResponse](data=detail)
 
 
 @router.get(

@@ -107,3 +107,26 @@ class BacktestRunRepository:
             .all()
         )
         return rows
+
+    def list_for_strategy_card(
+        self,
+        *,
+        strategy_card_id: UUID,
+        user_id: UUID,
+        limit: int = 20,
+    ) -> list[tuple[BacktestRunModel, StrategySnapshotModel]]:
+        rows = (
+            self.session.query(BacktestRunModel, StrategySnapshotModel)
+            .join(
+                StrategySnapshotModel,
+                StrategySnapshotModel.id == BacktestRunModel.strategy_snapshot_id,
+            )
+            .filter(
+                BacktestRunModel.user_id == user_id,
+                StrategySnapshotModel.strategy_card_id == strategy_card_id,
+            )
+            .order_by(BacktestRunModel.created_at.desc(), BacktestRunModel.id.desc())
+            .limit(limit)
+            .all()
+        )
+        return rows

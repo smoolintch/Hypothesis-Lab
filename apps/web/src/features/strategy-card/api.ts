@@ -4,6 +4,7 @@ import { ApiClientError, apiRequest } from "@/lib/api/client";
 
 import type {
   RecentBacktestListResponse,
+  StrategyBacktestHistoryResponse,
   StrategyCardDetail,
   StrategyCardListResponse,
   StrategyCardUpsertPayload,
@@ -39,6 +40,12 @@ export async function getRecentBacktests() {
   return apiRequest<RecentBacktestListResponse>("/backtests/recent");
 }
 
+export async function getStrategyBacktestHistory(strategyCardId: string) {
+  return apiRequest<StrategyBacktestHistoryResponse>(
+    `/backtests/strategy-cards/${strategyCardId}/history`,
+  );
+}
+
 export async function updateStrategyCard(
   strategyCardId: string,
   payload: StrategyCardUpsertPayload,
@@ -67,6 +74,8 @@ export function useStrategyCardQuery(strategyCardId?: string) {
 }
 
 export const recentBacktestsQueryKey = () => ["recent-backtests"] as const;
+export const strategyBacktestHistoryQueryKey = (strategyCardId: string) =>
+  ["strategy-backtest-history", strategyCardId] as const;
 
 export function useStrategyCardListQuery() {
   return useQuery({
@@ -79,6 +88,16 @@ export function useRecentBacktestsQuery() {
   return useQuery({
     queryKey: recentBacktestsQueryKey(),
     queryFn: getRecentBacktests,
+  });
+}
+
+export function useStrategyBacktestHistoryQuery(strategyCardId?: string) {
+  return useQuery({
+    queryKey: strategyCardId
+      ? strategyBacktestHistoryQueryKey(strategyCardId)
+      : ["strategy-backtest-history", "idle"],
+    queryFn: () => getStrategyBacktestHistory(strategyCardId as string),
+    enabled: Boolean(strategyCardId),
   });
 }
 

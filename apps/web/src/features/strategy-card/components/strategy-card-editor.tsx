@@ -34,6 +34,7 @@ import type {
   StrategyCardDetail,
   StrategyCardEditorMode,
 } from "../types";
+import { StrategyBacktestHistoryList } from "./strategy-backtest-history-list";
 import { StrategyCardFormFields } from "./strategy-card-form-fields";
 import styles from "./strategy-card-editor.module.css";
 
@@ -436,22 +437,25 @@ export function StrategyCardEditor({
 
         <section className={styles.panel} data-testid="strategy-card-editor-panel">
           {detail ? (
-            <div className={styles.metaGrid} data-testid="strategy-card-meta">
-              <div className={styles.metaItem}>
-                <span className={styles.metaLabel}>策略卡 ID</span>
-                <span className={styles.metaValue}>{detail.id}</span>
+            <>
+              <div className={styles.metaGrid} data-testid="strategy-card-meta">
+                <div className={styles.metaItem}>
+                  <span className={styles.metaLabel}>策略卡 ID</span>
+                  <span className={styles.metaValue}>{detail.id}</span>
+                </div>
+                <div className={styles.metaItem}>
+                  <span className={styles.metaLabel}>当前状态</span>
+                  <span className={styles.metaValue}>{detail.status}</span>
+                </div>
+                <div className={styles.metaItem}>
+                  <span className={styles.metaLabel}>最近更新时间</span>
+                  <span className={styles.metaValue}>
+                    {formatDateTime(detail.updated_at)}
+                  </span>
+                </div>
               </div>
-              <div className={styles.metaItem}>
-                <span className={styles.metaLabel}>当前状态</span>
-                <span className={styles.metaValue}>{detail.status}</span>
-              </div>
-              <div className={styles.metaItem}>
-                <span className={styles.metaLabel}>最近更新时间</span>
-                <span className={styles.metaValue}>
-                  {formatDateTime(detail.updated_at)}
-                </span>
-              </div>
-            </div>
+              <StrategyBacktestHistoryList strategyCardId={detail.id} />
+            </>
           ) : null}
 
           {hasClientValidationErrors ? (

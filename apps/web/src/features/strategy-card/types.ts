@@ -162,3 +162,17 @@ export interface RecentBacktestSummary {
 export interface RecentBacktestListResponse {
   items: RecentBacktestSummary[];
 }
+
+export interface StrategyBacktestHistoryItem {
+  run_id: string;
+  status: "queued" | "running" | "succeeded" | "failed" | "cancelled";
+  result_url: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  created_at: string;
+}
+
+export interface StrategyBacktestHistoryResponse {
+  strategy_card_id: string;
+  items: StrategyBacktestHistoryItem[];
+}

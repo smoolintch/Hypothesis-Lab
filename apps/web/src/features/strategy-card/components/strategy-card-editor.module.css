@@ -78,6 +78,47 @@
   gap: 24px;
 }
 
+.historySection {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.historyList {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+}
+
+.historyItem {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.historySummary {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: 6px;
+}
+
+.historyRunId {
+  display: block;
+  word-break: break-word;
+}
+
+.historyMeta {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .section {
   display: grid;
   gap: 16px;
@@ -243,6 +284,10 @@
 
   .actions {
     justify-content: stretch;
+  }
+
+  .historyItem {
+    align-items: stretch;
   }
 
   .buttonPrimary,
