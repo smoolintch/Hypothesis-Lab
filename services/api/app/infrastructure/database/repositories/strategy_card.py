@@ -58,6 +58,34 @@ class StrategyCardRepository:
             .one_or_none()
         )
 
+    def duplicate(
+        self,
+        *,
+        source_record: StrategyCardModel,
+        strategy_card_id: UUID,
+        created_at: datetime,
+        updated_at: datetime,
+    ) -> StrategyCardModel:
+        record = StrategyCardModel(
+            id=strategy_card_id,
+            user_id=source_record.user_id,
+            name=source_record.name,
+            symbol=source_record.symbol,
+            timeframe=source_record.timeframe,
+            backtest_range=source_record.backtest_range,
+            initial_capital=source_record.initial_capital,
+            fee_rate=source_record.fee_rate,
+            rule_set=source_record.rule_set,
+            status=source_record.status,
+            latest_backtest_run_id=None,
+            created_at=created_at,
+            updated_at=updated_at,
+        )
+        self.session.add(record)
+        self.session.commit()
+        self.session.refresh(record)
+        return record
+
     def update(
         self,
         *,

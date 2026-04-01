@@ -96,6 +96,19 @@ def update_strategy_card(
 
 
 @router.post(
+    "/{strategy_card_id}/duplicate",
+    response_model=SuccessResponse[StrategyCardDetailResponse],
+    status_code=status.HTTP_201_CREATED,
+)
+def duplicate_strategy_card(
+    strategy_card_id: UUID,
+    service: StrategyCardService = Depends(get_strategy_card_service),
+) -> SuccessResponse[StrategyCardDetailResponse]:
+    detail = service.duplicate(strategy_card_id)
+    return SuccessResponse[StrategyCardDetailResponse](data=detail)
+
+
+@router.post(
     "/{strategy_card_id}/backtests",
     response_model=SuccessResponse[BacktestRunResponse],
     status_code=status.HTTP_202_ACCEPTED,

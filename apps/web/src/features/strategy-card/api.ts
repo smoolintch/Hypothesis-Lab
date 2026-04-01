@@ -44,6 +44,13 @@ export async function updateStrategyCard(
   });
 }
 
+export async function duplicateStrategyCard(strategyCardId: string) {
+  return apiRequest<StrategyCardDetail>(`/strategy-cards/${strategyCardId}/duplicate`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
 export function useStrategyCardQuery(strategyCardId?: string) {
   return useQuery({
     queryKey: strategyCardId
@@ -64,6 +71,17 @@ export function useStrategyCardListQuery() {
 export function useCreateStrategyCardMutation() {
   return useMutation({
     mutationFn: createStrategyCard,
+  });
+}
+
+export function useDuplicateStrategyCardMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: duplicateStrategyCard,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: strategyCardListQueryKey() });
+    },
   });
 }
 

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { useStrategyCardListQuery } from "../api";
+import { ApiClientError, useDuplicateStrategyCardMutation, useStrategyCardListQuery } from "../api";
 import styles from "@/app/page.module.css";
 
 function formatUpdatedAt(value: string) {
@@ -21,8 +23,29 @@ function formatUpdatedAt(value: string) {
 }
 
 export function StrategyCardList() {
+  const router = useRouter();
   const query = useStrategyCardListQuery();
+  const duplicateMutation = useDuplicateStrategyCardMutation();
+  const [duplicateError, setDuplicateError] = useState<string | null>(null);
+  const [duplicatingStrategyCardId, setDuplicatingStrategyCardId] = useState<string | null>(null);
   const items = query.data?.items ?? [];
+
+  async function handleDuplicate(strategyCardId: string) {
+    setDuplicateError(null);
+    setDuplicatingStrategyCardId(strategyCardId);
+
+    try {
+      const duplicatedCard = await duplicateMutation.mutateAsync(strategyCardId);
+      router.push(`/strategy-cards/${duplicatedCard.id}/edit`);
+    } catch (error) {
+      if (error instanceof ApiClientError) {
+        setDuplicateError(error.message);
+      } else {
+        setDuplicateError("复制策略卡失败，请稍后重试。");
+      }
+      setDuplicatingStrategyCardId(null);
+    }
+  }
 
   if (query.isLoading) {
     return (
@@ -54,26 +77,44 @@ export function StrategyCardList() {
   return (
     <section className={styles.panel} data-testid="strategy-card-list">
       <h2 className={styles.panelTitle}>已有策略卡</h2>
+      {duplicateError ? (
+        <p className={styles.note} data-testid="strategy-card-duplicate-error">
+          {duplicateError}
+        </p>
+      ) : null}
       <ul className={styles.loop} data-testid="strategy-card-list-items">
-        {items.map((item) => (
-          <li key={item.id} data-testid={`strategy-card-list-item-${item.id}`}>
-            <div>
-              <strong>{item.name}</strong>
+        {items.map((item) => {
+          const isDuplicating = duplicatingStrategyCardId === item.id;
+
+          return (
+            <li key={item.id} data-testid={`strategy-card-list-item-${item.id}`}>
               <div>
-                {item.symbol} · {item.timeframe} · 最近更新 {formatUpdatedAt(item.updated_at)}
+                <strong>{item.name}</strong>
+                <div>
+                  {item.symbol} · {item.timeframe} · 最近更新 {formatUpdatedAt(item.updated_at)}
+                </div>
               </div>
-            </div>
-            <div className={styles.actions}>
-              <Link
-                className={styles.cta}
-                href={`/strategy-cards/${item.id}/edit`}
-                data-testid={`strategy-card-edit-link-${item.id}`}
-              >
-                进入编辑
-              </Link>
-            </div>
-          </li>
-        ))}
+              <div className={styles.actions}>
+                <Link
+                  className={styles.cta}
+                  href={`/strategy-cards/${item.id}/edit`}
+                  data-testid={`strategy-card-edit-link-${item.id}`}
+                >
+                  进入编辑
+                </Link>
+                <button
+                  type="button"
+                  className={styles.cta}
+                  data-testid={`strategy-card-duplicate-button-${item.id}`}
+                  onClick={() => void handleDuplicate(item.id)}
+                  disabled={isDuplicating || duplicateMutation.isPending}
+                >
+                  {isDuplicating ? "复制中…" : "复制策略卡"}
+                </button>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

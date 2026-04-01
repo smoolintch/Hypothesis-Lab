@@ -84,3 +84,37 @@ test("home page shows populated strategy list and allows navigating to edit page
   await expect(page.getByTestId("strategy-card-form")).toBeVisible();
   await expect(page.getByTestId("strategy-card-name-input")).toHaveValue(strategyName);
 });
+
+test("home page duplicates a strategy card and navigates to the duplicated edit page", async ({ page }) => {
+  const strategyName = "Homepage Strategy Duplicate E2E";
+
+  await fillStrategyCardForm(page, strategyName);
+  await page.getByTestId("strategy-card-submit-button").click();
+  await page.waitForURL(/\/strategy-cards\/[^/]+\/edit$/);
+
+  const sourceStrategyId = page.url().match(/\/strategy-cards\/([^/]+)\/edit$/)?.[1];
+  expect(sourceStrategyId).toBeTruthy();
+
+  await page.goto("/");
+
+  const sourceStrategyListItem = page.getByTestId(`strategy-card-list-item-${sourceStrategyId}`);
+  await expect(sourceStrategyListItem).toBeVisible();
+
+  const duplicateButton = sourceStrategyListItem.getByTestId(
+    `strategy-card-duplicate-button-${sourceStrategyId}`,
+  );
+  await duplicateButton.click();
+  await expect(duplicateButton).toContainText("复制中");
+
+  await page.waitForURL(/\/strategy-cards\/[^/]+\/edit$/);
+
+  const duplicatedStrategyId = page.url().match(/\/strategy-cards\/([^/]+)\/edit$/)?.[1];
+  expect(duplicatedStrategyId).toBeTruthy();
+  expect(duplicatedStrategyId).not.toBe(sourceStrategyId);
+
+  await expect(page.getByRole("heading", { name: "编辑策略假设卡" })).toBeVisible();
+  await expect(page.getByTestId("strategy-card-form")).toBeVisible();
+  await expect(page.getByTestId("strategy-card-name-input")).toHaveValue(strategyName);
+  await expect(page.getByTestId("strategy-card-symbol-select")).toHaveValue("BTCUSDT");
+  await expect(page.getByTestId("strategy-card-timeframe-select")).toHaveValue("1D");
+});

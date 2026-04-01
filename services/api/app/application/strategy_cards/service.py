@@ -91,6 +91,23 @@ class StrategyCardService:
         )
         return self._to_detail_response(record)
 
+    def duplicate(self, strategy_card_id: UUID) -> StrategyCardDetailResponse:
+        record = self.repository.get_by_id(
+            strategy_card_id=strategy_card_id,
+            user_id=self.settings.default_user_id,
+        )
+        if record is None:
+            raise StrategyCardNotFoundError(str(strategy_card_id))
+
+        now = utc_now()
+        duplicated = self.repository.duplicate(
+            source_record=record,
+            strategy_card_id=uuid4(),
+            created_at=now,
+            updated_at=now,
+        )
+        return self._to_detail_response(duplicated)
+
     def _to_detail_response(
         self,
         record,
