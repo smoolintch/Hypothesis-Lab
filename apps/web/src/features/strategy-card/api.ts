@@ -2,18 +2,32 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { ApiClientError, apiRequest } from "@/lib/api/client";
 
-import type { StrategyCardDetail, StrategyCardUpsertPayload } from "./types";
+import type {
+  StrategyCardDetail,
+  StrategyCardListResponse,
+  StrategyCardUpsertPayload,
+} from "./types";
 
 export { ApiClientError };
 
 export const strategyCardQueryKey = (strategyCardId: string) =>
   ["strategy-card", strategyCardId] as const;
 
+export const strategyCardListQueryKey = () => ["strategy-cards"] as const;
+
 export async function createStrategyCard(payload: StrategyCardUpsertPayload) {
   return apiRequest<StrategyCardDetail>("/strategy-cards", {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export async function getStrategyCardList(page = 1, pageSize = 20) {
+  const params = new URLSearchParams({
+    page: String(page),
+    page_size: String(pageSize),
+  });
+  return apiRequest<StrategyCardListResponse>(`/strategy-cards?${params}`);
 }
 
 export async function getStrategyCard(strategyCardId: string) {
@@ -37,6 +51,13 @@ export function useStrategyCardQuery(strategyCardId?: string) {
       : ["strategy-card", "idle"],
     queryFn: () => getStrategyCard(strategyCardId as string),
     enabled: Boolean(strategyCardId),
+  });
+}
+
+export function useStrategyCardListQuery() {
+  return useQuery({
+    queryKey: strategyCardListQueryKey(),
+    queryFn: () => getStrategyCardList(),
   });
 }
 

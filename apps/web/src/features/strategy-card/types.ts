@@ -126,3 +126,24 @@ export interface StrategyCardDetail extends StrategyCardUpsertPayload {
 }
 
 export type StrategyCardEditorMode = "create" | "edit";
+
+export interface StrategyCardSummary {
+  id: string;
+  name: string;
+  symbol: string;
+  timeframe: string;
+  status: "draft" | "ready" | "archived";
+  updated_at: string;
+  latest_backtest_run_id: string | null;
+}
+
+export interface PaginationMeta {
+  page: number;
+  page_size: number;
+  total: number;
+}
+
+export interface StrategyCardListResponse {
+  items: StrategyCardSummary[];
+  pagination: PaginationMeta;
+}

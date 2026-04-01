@@ -41,13 +41,13 @@
 
 ## 4. 当前最优先任务
 1. 阶段 3 已正式通过（2026-03-31）——三条主链路全部成立，14/14 E2E + 43/43 集成测试全部通过
-2. 阶段 4「策略列表」后端已落地并通过验收（2026-03-31）：`GET /api/strategy-cards` 已可用（分页 + 状态筛选 + 按 `updated_at` 倒序），9/9 集成测试通过，全套 52/52 通过
-3. 下一步：前端接入策略列表页（`/strategy-cards` 页面 + 策略卡列表组件）
+2. 阶段 4「策略列表」前后端最小闭环已落地：`GET /api/strategy-cards` 已接入首页 `/`，支持有数据列表、无数据空状态、进入编辑页（2026-03-31）
+3. 下一步：交付测试 Agent 验收策略列表前端闭环
 
 阶段 2 主链路已正式验收通过（2026-03-30）。阶段 3 已正式通过（2026-03-31）。
 
 ## 5. 当前推荐的下一步
-1. 前端接入策略列表页（`/strategy-cards` 页面，调用 `GET /api/strategy-cards`，展示卡片列表 + 分页 + 新建入口）
+1. 测试 Agent 验收策略列表前端闭环（首页 `/` 调用 `GET /api/strategy-cards`；覆盖有数据、空状态、进入编辑页）
 2. 进入阶段 4：复制策略卡（`POST /api/strategy-cards/{id}/duplicate`）
 3. 早期补齐遗留项：结论加载 + `/handbook` 列表
 
@@ -116,6 +116,7 @@
 59. 已在 `apps/web` 落地「加入交易手册」最小前端闭环：结论保存成功（`SavedConclusionView`）后，当 `next_action === "add_to_handbook"` 时展示手册区块，含可选 `memo` 文本域和"加入交易手册"按钮；调用 `POST /api/handbook`；保存中 / 保存成功（转只读摘要 + 前往手册页链接）/ 保存失败（含 `HANDBOOK_ENTRY_ALREADY_EXISTS`、`CONCLUSION_NOT_ELIGIBLE_FOR_HANDBOOK` 文案）三种状态均有反馈；build / typecheck / lint 零错误通过。
 60. 已在 `apps/web` 新增 `/handbook` 最小承接页（`apps/web/src/app/handbook/page.tsx`）：路由从 404 变为可用静态页面；页面承认「加入交易手册」功能已开通、说明手册条目列表将在后续版本提供（后端 `GET /api/handbook` 尚未实现，不伪造数据）；含 `data-testid="handbook-page"`、`data-testid="handbook-placeholder"`；typecheck / lint / build 零错误通过。
 61. 已在 `services/api` 落地「策略列表」最小后端：`StrategyCardRepository.list_paginated()`（按 `updated_at` 倒序、`status` 可选筛选、offset/limit 分页）、`StrategyCardService.list_cards()`、`GET /api/strategy-cards`（`200`，返回 `StrategyCardSummaryResponse[]` + `PaginationMeta`）；新增 `StrategyCardSummaryResponse`、`StrategyCardListResponse`、`PaginationMeta` 三个 schema；`page_size` 最大 100；9 个集成测试（空列表、有数据、字段子集校验、按更新时间倒序、分页边界、状态筛选、反映最新回测 run）全部通过；全套 52/52 通过。
+62. 已在 `apps/web` 落地「策略列表」最小前端闭环：首页 `/` 直接承接已有策略卡列表，调用真实 `GET /api/strategy-cards?page=1&page_size=20`；加载中、错误、有数据、无数据四种状态均有明确 UI；有数据时展示名称、标的、周期、最近更新时间，并提供进入 `/strategy-cards/{id}/edit` 的入口；无数据时展示明确空状态；未引入复制、最近实验、历史回测、搜索、筛选或复杂分页；typecheck / lint / build 零错误通过。
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`
