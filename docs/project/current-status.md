@@ -41,14 +41,14 @@
 
 ## 4. 当前最优先任务
 1. 阶段 3 已正式通过（2026-03-31）——三条主链路全部成立，14/14 E2E + 43/43 集成测试全部通过
-2. 阶段 4「策略列表」与「复制策略卡」前后端最小闭环已落地：`GET /api/strategy-cards`、`POST /api/strategy-cards/{id}/duplicate` 已接入首页 `/`，支持列表展示、空状态、进入编辑、复制后跳转新卡编辑页（2026-04-01）
-3. 下一步：交付测试 Agent 验收阶段 4 首批闭环
+2. 阶段 4「策略列表」「复制策略卡」「最近实验记录」后端均已落地：`GET /api/strategy-cards`、`POST /api/strategy-cards/{id}/duplicate`、`GET /api/backtests/recent` 已可用
+3. 下一步：前端接入复制入口与最近实验记录区块，完成首页阶段 4 首批能力
 
 阶段 2 主链路已正式验收通过（2026-03-30）。阶段 3 已正式通过（2026-03-31）。
 
 ## 5. 当前推荐的下一步
-1. 前端接入复制策略卡入口（基于 `POST /api/strategy-cards/{id}/duplicate`），完成阶段 4 首批前后端闭环
-2. 交付测试 Agent 验收策略列表 + 复制策略卡两条阶段 4 最小链路
+1. 前端接入最近实验记录区块（基于 `GET /api/backtests/recent`），与策略列表一起补齐首页阶段 4 首批信息架构
+2. 交付测试 Agent 验收策略列表 + 复制策略卡 + 最近实验记录三条阶段 4 最小链路
 3. 早期补齐遗留项：结论加载 + `/handbook` 列表
 
 ## 6. 当前未决问题
@@ -118,6 +118,7 @@
 61. 已在 `services/api` 落地「策略列表」最小后端：`StrategyCardRepository.list_paginated()`（按 `updated_at` 倒序、`status` 可选筛选、offset/limit 分页）、`StrategyCardService.list_cards()`、`GET /api/strategy-cards`（`200`，返回 `StrategyCardSummaryResponse[]` + `PaginationMeta`）；新增 `StrategyCardSummaryResponse`、`StrategyCardListResponse`、`PaginationMeta` 三个 schema；`page_size` 最大 100；9 个集成测试（空列表、有数据、字段子集校验、按更新时间倒序、分页边界、状态筛选、反映最新回测 run）全部通过；全套 52/52 通过。
 62. 已在 `apps/web` 落地「策略列表」最小前端闭环：首页 `/` 直接承接已有策略卡列表，调用真实 `GET /api/strategy-cards?page=1&page_size=20`；加载中、错误、有数据、无数据四种状态均有明确 UI；有数据时展示名称、标的、周期、最近更新时间，并提供进入 `/strategy-cards/{id}/edit` 的入口；无数据时展示明确空状态；未引入复制、最近实验、历史回测、搜索、筛选或复杂分页；typecheck / lint / build 零错误通过。
 63. 已在 `services/api` 落地「复制策略卡」最小后端：`StrategyCardRepository.duplicate()`、`StrategyCardService.duplicate()`、`POST /api/strategy-cards/{id}/duplicate`（`201`，返回 `StrategyCardDetailResponse`）；继承 `name`、`symbol`、`timeframe`、`backtest_range`、`initial_capital`、`fee_rate`、`rule_set`、`status`，重置 `id`、`created_at`、`updated_at`、`latest_backtest_run_id`，避免复用历史运行关联；已通过 5 个集成测试（成功复制、源卡不存在、身份字段重置、不复制最新 run、复制后独立可编辑），全套 API 测试 57/57 通过。
+64. 已在 `services/api` 落地「最近实验记录」最小后端：新增 `GET /api/backtests/recent`，基于 `BacktestRun` 主视角并联接 `StrategySnapshot` / `StrategyCard` 返回最近实验项；按 `BacktestRun.created_at desc, id desc` 稳定倒序；最小字段包含 `run_id`、`strategy_card_id`、`strategy_card_name`、`status`、`result_url`、`started_at`、`finished_at`、`created_at`；空数据返回 `items: []`；已通过 5 个集成测试（空列表、有数据、倒序、字段子集、成功 run 的 result_url），全套 API 测试 62/62 通过。
 
 ## 8. 开工前必读文档
 1. `AGENTS.md`

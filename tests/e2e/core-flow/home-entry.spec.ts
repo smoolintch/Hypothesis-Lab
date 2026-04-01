@@ -15,6 +15,13 @@ test("home page exposes strategy list area and navigates to new strategy page", 
       .or(page.getByTestId("strategy-card-list-loading"))
       .or(page.getByTestId("strategy-card-list-error")),
   ).toBeVisible();
+  await expect(
+    page
+      .getByTestId("recent-backtests")
+      .or(page.getByTestId("recent-backtests-empty"))
+      .or(page.getByTestId("recent-backtests-loading"))
+      .or(page.getByTestId("recent-backtests-error")),
+  ).toBeVisible();
   await expect(page.getByTestId("home-create-strategy-link")).toBeVisible();
   await expect(page.getByTestId("home-create-strategy-link")).toHaveText("新建策略假设");
 

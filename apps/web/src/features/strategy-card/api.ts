@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiClientError, apiRequest } from "@/lib/api/client";
 
 import type {
+  RecentBacktestListResponse,
   StrategyCardDetail,
   StrategyCardListResponse,
   StrategyCardUpsertPayload,
@@ -34,6 +35,10 @@ export async function getStrategyCard(strategyCardId: string) {
   return apiRequest<StrategyCardDetail>(`/strategy-cards/${strategyCardId}`);
 }
 
+export async function getRecentBacktests() {
+  return apiRequest<RecentBacktestListResponse>("/backtests/recent");
+}
+
 export async function updateStrategyCard(
   strategyCardId: string,
   payload: StrategyCardUpsertPayload,
@@ -61,10 +66,19 @@ export function useStrategyCardQuery(strategyCardId?: string) {
   });
 }
 
+export const recentBacktestsQueryKey = () => ["recent-backtests"] as const;
+
 export function useStrategyCardListQuery() {
   return useQuery({
     queryKey: strategyCardListQueryKey(),
     queryFn: () => getStrategyCardList(),
+  });
+}
+
+export function useRecentBacktestsQuery() {
+  return useQuery({
+    queryKey: recentBacktestsQueryKey(),
+    queryFn: getRecentBacktests,
   });
 }
 

@@ -76,6 +76,23 @@
   align-items: center;
 }
 
+.recentBacktestItem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recentBacktestSummary {
+  min-width: 0;
+  flex: 1;
+}
+
+.recentBacktestSummary strong {
+  display: block;
+}
+
 .cta {
   display: inline-flex;
   align-items: center;

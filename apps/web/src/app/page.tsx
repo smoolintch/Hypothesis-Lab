@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { RecentBacktestList } from "@/features/strategy-card/components/recent-backtest-list";
 import { StrategyCardList } from "@/features/strategy-card/components/strategy-card-list";
 
 import styles from "./page.module.css";
@@ -16,6 +17,7 @@ export default function Home() {
         </p>
 
         <StrategyCardList />
+        <RecentBacktestList />
 
         <div className={styles.actions}>
           <Link

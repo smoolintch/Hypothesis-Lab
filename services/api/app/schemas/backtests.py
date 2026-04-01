@@ -68,3 +68,22 @@ class BacktestResultResponse(BaseModel):
     trades: list[TradeRecordResponse]
     result_summary: dict
     created_at: datetime
+
+
+class RecentExperimentItemResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    run_id: UUID
+    strategy_card_id: UUID
+    strategy_card_name: str
+    status: str
+    result_url: str | None
+    started_at: datetime | None
+    finished_at: datetime | None
+    created_at: datetime
+
+
+class RecentExperimentsResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    items: list[RecentExperimentItemResponse]

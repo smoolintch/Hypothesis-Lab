@@ -6,6 +6,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.infrastructure.database.models.backtest_run import BacktestRunModel
+from app.infrastructure.database.models.strategy_card import StrategyCardModel
 from app.infrastructure.database.models.strategy_snapshot import StrategySnapshotModel
 
 
@@ -83,3 +84,26 @@ class BacktestRunRepository:
         if snapshot is None:
             return None
         return run, snapshot
+
+    def list_recent_for_user(
+        self,
+        *,
+        user_id: UUID,
+        limit: int = 5,
+    ) -> list[tuple[BacktestRunModel, StrategySnapshotModel, StrategyCardModel]]:
+        rows = (
+            self.session.query(BacktestRunModel, StrategySnapshotModel, StrategyCardModel)
+            .join(
+                StrategySnapshotModel,
+                StrategySnapshotModel.id == BacktestRunModel.strategy_snapshot_id,
+            )
+            .join(
+                StrategyCardModel,
+                StrategyCardModel.id == StrategySnapshotModel.strategy_card_id,
+            )
+            .filter(BacktestRunModel.user_id == user_id)
+            .order_by(BacktestRunModel.created_at.desc(), BacktestRunModel.id.desc())
+            .limit(limit)
+            .all()
+        )
+        return rows

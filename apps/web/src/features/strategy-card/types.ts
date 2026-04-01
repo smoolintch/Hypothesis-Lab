@@ -147,3 +147,18 @@ export interface StrategyCardListResponse {
   items: StrategyCardSummary[];
   pagination: PaginationMeta;
 }
+
+export interface RecentBacktestSummary {
+  run_id: string;
+  strategy_card_id: string;
+  strategy_card_name: string;
+  status: "queued" | "running" | "succeeded" | "failed" | "cancelled";
+  result_url: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  created_at: string;
+}
+
+export interface RecentBacktestListResponse {
+  items: RecentBacktestSummary[];
+}

@@ -36,6 +36,8 @@ from app.schemas.backtests import (
     BacktestResultResponse,
     BacktestRunResponse,
     CurvePointResponse,
+    RecentExperimentItemResponse,
+    RecentExperimentsResponse,
     SummaryMetricsResponse,
     TradeRecordResponse,
 )
@@ -181,6 +183,29 @@ class BacktestRunService:
             raise BacktestResultNotReadyError(str(run_id))
 
         return self._to_result_response(result_record, run, snapshot)
+
+    def list_recent_experiments(self, *, limit: int = 5) -> RecentExperimentsResponse:
+        rows = self.run_repo.list_recent_for_user(
+            user_id=self.settings.default_user_id,
+            limit=limit,
+        )
+        return RecentExperimentsResponse(
+            items=[
+                RecentExperimentItemResponse(
+                    run_id=run.id,
+                    strategy_card_id=card.id,
+                    strategy_card_name=card.name,
+                    status=run.status,
+                    result_url=(
+                        f"/api/backtests/{run.id}/result" if run.status == "succeeded" else None
+                    ),
+                    started_at=coerce_utc(run.started_at) if run.started_at is not None else None,
+                    finished_at=coerce_utc(run.finished_at) if run.finished_at is not None else None,
+                    created_at=coerce_utc(run.created_at),
+                )
+                for run, _snapshot, card in rows
+            ]
+        )
 
     def _execute_and_persist_result(self, run, normalized_config: dict) -> None:
         started_at = utc_now()

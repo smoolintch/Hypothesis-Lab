@@ -7,7 +7,11 @@ from sqlalchemy.orm import Session
 
 from app.application.backtests.service import BacktestRunService
 from app.infrastructure.database import get_session
-from app.schemas.backtests import BacktestResultResponse, BacktestRunResponse
+from app.schemas.backtests import (
+    BacktestResultResponse,
+    BacktestRunResponse,
+    RecentExperimentsResponse,
+)
 from app.schemas.common import SuccessResponse
 
 router = APIRouter(prefix="/backtests", tags=["backtests"])
@@ -15,6 +19,18 @@ router = APIRouter(prefix="/backtests", tags=["backtests"])
 
 def get_backtest_run_service(session: Session = Depends(get_session)) -> BacktestRunService:
     return BacktestRunService(session)
+
+
+@router.get(
+    "/recent",
+    response_model=SuccessResponse[RecentExperimentsResponse],
+    status_code=status.HTTP_200_OK,
+)
+def list_recent_experiments(
+    service: BacktestRunService = Depends(get_backtest_run_service),
+) -> SuccessResponse[RecentExperimentsResponse]:
+    detail = service.list_recent_experiments()
+    return SuccessResponse[RecentExperimentsResponse](data=detail)
 
 
 @router.get(
