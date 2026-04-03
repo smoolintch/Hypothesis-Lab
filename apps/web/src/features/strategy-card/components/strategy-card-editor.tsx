@@ -41,6 +41,8 @@ import styles from "./strategy-card-editor.module.css";
 type StrategyCardEditorProps = {
   mode: StrategyCardEditorMode;
   strategyCardId?: string;
+  duplicatedFromSourceId?: string;
+  duplicatedFromSourceName?: string;
 };
 
 type ServerValidationError = {
@@ -233,12 +235,17 @@ function getPageCopy(mode: StrategyCardEditorMode) {
 export function StrategyCardEditor({
   mode,
   strategyCardId,
+  duplicatedFromSourceId,
+  duplicatedFromSourceName,
 }: StrategyCardEditorProps) {
   const router = useRouter();
   const copy = getPageCopy(mode);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<ApiClientError | null>(null);
   const [backtestError, setBacktestError] = useState<ApiClientError | null>(null);
+  const [duplicateHandoffVisible, setDuplicateHandoffVisible] = useState(
+    mode === "edit" && Boolean(duplicatedFromSourceId),
+  );
 
   const defaultValues = useMemo(() => createDefaultStrategyCardFormValues(), []);
   const form = useForm<StrategyCardFormInput, unknown, StrategyCardFormValues>({
@@ -438,6 +445,43 @@ export function StrategyCardEditor({
         <section className={styles.panel} data-testid="strategy-card-editor-panel">
           {detail ? (
             <>
+              {duplicateHandoffVisible ? (
+                <div
+                  className={`${styles.message} ${styles.messageSuccess}`}
+                  data-testid="strategy-card-duplicate-handoff"
+                >
+                  <p className={styles.messageTitle}>复制成功，已进入新策略卡</p>
+                  <p>
+                    当前正在编辑复制出来的新卡
+                    {detail.name ? `「${detail.name}」` : ""}
+                    ，后续保存只会影响这张新卡。
+                    {duplicatedFromSourceName
+                      ? ` 来源：${duplicatedFromSourceName}。`
+                      : ""}
+                    {duplicatedFromSourceId
+                      ? ` 来源策略卡 ID：${duplicatedFromSourceId}。`
+                      : ""}
+                  </p>
+                  <p>你可以继续调整关键字段后直接保存。</p>
+                  <div className={styles.inlineActions}>
+                    <button
+                      className={styles.buttonSecondary}
+                      type="button"
+                      onClick={() => setDuplicateHandoffVisible(false)}
+                    >
+                      我知道了
+                    </button>
+                    {duplicatedFromSourceId ? (
+                      <Link
+                        className={styles.buttonSecondary}
+                        href={`/strategy-cards/${duplicatedFromSourceId}/edit`}
+                      >
+                        返回原卡
+                      </Link>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
               <div className={styles.metaGrid} data-testid="strategy-card-meta">
                 <div className={styles.metaItem}>
                   <span className={styles.metaLabel}>策略卡 ID</span>

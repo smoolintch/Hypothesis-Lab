@@ -36,7 +36,13 @@ export function StrategyCardList() {
 
     try {
       const duplicatedCard = await duplicateMutation.mutateAsync(strategyCardId);
-      router.push(`/strategy-cards/${duplicatedCard.id}/edit`);
+      const searchParams = new URLSearchParams({
+        sourceId: strategyCardId,
+        sourceName:
+          items.find((item) => item.id === strategyCardId)?.name ?? "原策略卡",
+        duplicatedFrom: "true",
+      });
+      router.push(`/strategy-cards/${duplicatedCard.id}/edit?${searchParams.toString()}`);
     } catch (error) {
       if (error instanceof ApiClientError) {
         setDuplicateError(error.message);

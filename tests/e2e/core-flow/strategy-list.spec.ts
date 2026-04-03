@@ -85,8 +85,9 @@ test("home page shows populated strategy list and allows navigating to edit page
   await expect(page.getByTestId("strategy-card-name-input")).toHaveValue(strategyName);
 });
 
-test("home page duplicates a strategy card and navigates to the duplicated edit page", async ({ page }) => {
+test("home page duplicates a strategy card, shows handoff feedback, and allows saving the duplicated card", async ({ page }) => {
   const strategyName = "Homepage Strategy Duplicate E2E";
+  const duplicatedStrategyName = `${strategyName} Copy`;
 
   await fillStrategyCardForm(page, strategyName);
   await page.getByTestId("strategy-card-submit-button").click();
@@ -106,9 +107,9 @@ test("home page duplicates a strategy card and navigates to the duplicated edit 
   await duplicateButton.click();
   await expect(duplicateButton).toContainText("复制中");
 
-  await page.waitForURL(/\/strategy-cards\/[^/]+\/edit$/);
+  await page.waitForURL(/\/strategy-cards\/[^/]+\/edit\?/);
 
-  const duplicatedStrategyId = page.url().match(/\/strategy-cards\/([^/]+)\/edit$/)?.[1];
+  const duplicatedStrategyId = page.url().match(/\/strategy-cards\/([^/?]+)\/edit/)?.[1];
   expect(duplicatedStrategyId).toBeTruthy();
   expect(duplicatedStrategyId).not.toBe(sourceStrategyId);
 
@@ -117,4 +118,18 @@ test("home page duplicates a strategy card and navigates to the duplicated edit 
   await expect(page.getByTestId("strategy-card-name-input")).toHaveValue(strategyName);
   await expect(page.getByTestId("strategy-card-symbol-select")).toHaveValue("BTCUSDT");
   await expect(page.getByTestId("strategy-card-timeframe-select")).toHaveValue("1D");
+
+  const handoff = page.getByTestId("strategy-card-duplicate-handoff");
+  await expect(handoff).toBeVisible();
+  await expect(handoff).toContainText("复制成功，已进入新策略卡");
+  await expect(handoff).toContainText(`来源：${strategyName}`);
+  await expect(handoff).toContainText(`来源策略卡 ID：${sourceStrategyId}`);
+
+  await page.getByTestId("strategy-card-name-input").fill(duplicatedStrategyName);
+  await page.getByTestId("strategy-card-submit-button").click();
+
+  await expect(page.getByTestId("strategy-card-save-success")).toBeVisible();
+  await expect(page.getByTestId("strategy-card-save-success")).toContainText("策略已保存");
+  await expect(page.getByTestId("strategy-card-name-input")).toHaveValue(duplicatedStrategyName);
+  await expect(handoff).toBeVisible();
 });
